@@ -6,6 +6,7 @@
 #include <SPI.h>
 #include <Ethernet.h>
 #include <SD.h>
+#include "HTTPparser.h"
 
 
 #define chipSelect 4
@@ -15,16 +16,18 @@
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 IPAddress ip(192, 168, 1, 33); // IP address, may need to change depending on network
 EthernetServer server(80);  // create a server at port 80
+HTTPparser Parser(35, 100);
 
 File webFile;
 
 char index[] = "index.htm";
 
+
 void setup()
 {
   pinMode(led, OUTPUT);
   digitalWrite(led, LOW);
-  
+
   Ethernet.begin(mac, ip);  // initialize Ethernet device
   server.begin();           // start to listen for clients
   Serial.begin(9600);       // for debugging
@@ -38,9 +41,9 @@ void setup()
   Serial.println("SUCCESS - SD card initialized.");
   //check for index.htm file
   if (!SD.exists(index)) {
-      Serial.println("ERROR - Can't find index.htm file!");
-      return;  // can't find index file
-    }
+    Serial.println("ERROR - Can't find index.htm file!");
+    return;  // can't find index file
+  }
   Serial.println("SUCCESS - Found index.htm file.");
 
 }
@@ -51,44 +54,57 @@ void loop()
 
   if (client) {  // got client?
     digitalWrite(led, HIGH);
-    boolean currentLineIsBlank = true;
+
+    // Collecting data from client
     while (client.connected()) {
       if (client.available()) {   // client data available to read
         char c = client.read(); // read 1 byte (character) from client
-        Serial.print(c);
-        // last line of client request is blank and ends with \n
-        // respond to client only after last line received
-        if (c == '\n' && currentLineIsBlank) {
-          // send a standard http response header
-          client.println("HTTP/1.1 200 OK");
-          client.println("Content-Type: text/html");
-          client.println("Connection: close");
-          client.println();
-          // send web page
-          webFile = SD.open(index);        // open web page file
-          if (webFile) {
-            while (webFile.available()) {
-              client.write(webFile.read()); // send web page to client
-            }
-            webFile.close();
-          }
-          break;
-        }
-        // every line of text received from the client ends with \r\n
-        if (c == '\n') {
-          // last character on line of received text
-          // starting new line with next character read
-          currentLineIsBlank = true;
-        }
-        else if (c != '\r') {
-          // a text character was received from client
-          currentLineIsBlank = false;
-        }
-      } // end if (client.available())
-    } // end while (client.connected())
+        //Serial.print(c);
+        Parser.ParseChar(c);
+      } else {
+        break; // Break when there is no more
+      }
+    }
+
+    // Tell the parser we are done
+    Parser.AllSheWrote();
+    if (Parser.IsValid()) { // Print some debug
+      Serial.println(Parser.MethodString());
+      Serial.println(Parser.Path);
+      Serial.println(Parser.Message);
+    } else
+      Serial.println("We have an error");
+
+    // Answer the client and elaborate actions
+    answerClient(client, Parser);
+
     delay(1);      // give the web browser time to receive the data
     client.stop(); // close the connection
+    Parser.Reset(); // Prepare parser for new request
     digitalWrite(led, LOW);
   } // end if (client)
+}
+
+void answerClient(EthernetClient &client, HTTPparser & parser) {
+
+  // Web clients make this assumption
+  if (strcmp(parser.Path, "/") == 0)
+    strcpy(parser.Path, "index.htm");
+
+  if (SD.exists(parser.Path)) {
+    webFile = SD.open(parser.Path);        // open web page file
+    if (webFile) {
+      client.println("HTTP/1.1 200 OK");
+      client.println("Content-Type: text/html");
+      client.println("Connection: close");
+      client.println();
+      while (webFile.available()) {
+        client.write(webFile.read()); // send web page to client
+      }
+      webFile.close();
+    }
+  } else {
+    // 404 not found
+  }
 }
 
