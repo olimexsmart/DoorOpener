@@ -93,6 +93,7 @@
                     method: "POST",
                     dataType: "text",
                     data: $('#newsentence').serialize(),
+					timeout: 3000,
 					success: function (result) {
 						console.log(result);
 					}

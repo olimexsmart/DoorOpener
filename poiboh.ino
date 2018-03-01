@@ -51,7 +51,7 @@ void loop()
 
     if (client) {  // got client?
         digitalWrite(led, HIGH);
-
+			
         // Collecting data from client
         while (client.connected()) {
             if (client.available()) {   // client data available to read
@@ -66,6 +66,7 @@ void loop()
         // Tell the parser we are done
         Parser.AllSheWrote();
         if (Parser.IsValid()) { // Print some debug
+        	Serial.println();
             Serial.println(Parser.MethodString());
             Serial.println(Parser.Path);
             Serial.println(Parser.Message);

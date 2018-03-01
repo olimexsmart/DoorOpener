@@ -56,8 +56,7 @@ void HTTPparser::ParseChar(char c) {
                 if (Method == NR) {
                     status = ERROR;
                     return;
-                }
-                method[index] = '\0';
+                }                
                 status = PATH;
                 index = 0;
                 return;
@@ -67,6 +66,8 @@ void HTTPparser::ParseChar(char c) {
             index++;
             if (index == 5)
                 status = ERROR;
+            else
+                method[index] = '\0';
             break;
 
         case PATH:
