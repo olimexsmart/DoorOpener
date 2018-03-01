@@ -84,13 +84,18 @@
     <script>
         $(function () {
             $('[data-toggle="tooltip"]').tooltip();
-
+			
+			
+			//handle = null;
             $('#submit').click(function () {
                 $.ajax({
-                    url: "",
+                    url: "echotest.php",
                     method: "POST",
                     dataType: "text",
-                    data: $('#newsentence').serialize()
+                    data: $('#newsentence').serialize(),
+					success: function (result) {
+						console.log(result);
+					}
                 });
                 //alert("Sent");
                 $('#thanks').modal();

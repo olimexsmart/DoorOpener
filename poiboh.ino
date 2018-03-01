@@ -1,5 +1,5 @@
 /*
-  Server Door Opener
+    Server Door Opener
 
 */
 
@@ -20,91 +20,67 @@ HTTPparser Parser(35, 100);
 
 File webFile;
 
-char index[] = "index.htm";
-
-
 void setup()
 {
-  pinMode(led, OUTPUT);
-  digitalWrite(led, LOW);
+    pinMode(led, OUTPUT);
+    digitalWrite(led, LOW);
 
-  Ethernet.begin(mac, ip);  // initialize Ethernet device
-  server.begin();           // start to listen for clients
-  Serial.begin(9600);       // for debugging
+    Ethernet.begin(mac, ip);  // initialize Ethernet device
+    server.begin();           // start to listen for clients
+    Serial.begin(9600);       // for debugging
 
-  // initialize SD card
-  Serial.println("Initializing SD card...");
-  if (!SD.begin(chipSelect)) {
-    Serial.println("ERROR - SD card initialization failed!");
-    return;    // init failed
-  }
-  Serial.println("SUCCESS - SD card initialized.");
-  //check for index.htm file
-  if (!SD.exists(index)) {
-    Serial.println("ERROR - Can't find index.htm file!");
-    return;  // can't find index file
-  }
-  Serial.println("SUCCESS - Found index.htm file.");
+    // initialize SD card
+    Serial.println("Initializing SD card...");
+    if (!SD.begin(chipSelect)) {
+        Serial.println("ERROR - SD card initialization failed!");
+        return;    // init failed
+    }
+    Serial.println("SUCCESS - SD card initialized.");
+    //check for index.htm file
+    if (!SD.exists("index.htm")) {
+        Serial.println("ERROR - Can't find index.htm file!");
+        return;  // can't find index file
+    }
+    Serial.println("SUCCESS - Found index.htm file.");
 
 }
 
 void loop()
 {
-  EthernetClient client = server.available();  // try to get client
+    EthernetClient client = server.available();  // try to get client
 
-  if (client) {  // got client?
-    digitalWrite(led, HIGH);
+    if (client) {  // got client?
+        digitalWrite(led, HIGH);
 
-    // Collecting data from client
-    while (client.connected()) {
-      if (client.available()) {   // client data available to read
-        char c = client.read(); // read 1 byte (character) from client
-        //Serial.print(c);
-        Parser.ParseChar(c);
-      } else {
-        break; // Break when there is no more
-      }
+        // Collecting data from client
+        while (client.connected()) {
+            if (client.available()) {   // client data available to read
+                char c = client.read(); // read 1 byte (character) from client
+                //Serial.print(c);
+                Parser.ParseChar(c);
+            } else {
+                break; // Break when there is no more
+            }
+        }
+
+        // Tell the parser we are done
+        Parser.AllSheWrote();
+        if (Parser.IsValid()) { // Print some debug
+            Serial.println(Parser.MethodString());
+            Serial.println(Parser.Path);
+            Serial.println(Parser.Message);
+        } else
+            Serial.println("We have an error");
+
+        // Answer the client and elaborate actions
+        answerClient(client, Parser);
+
+        delay(1);      // give the web browser time to receive the data
+        client.stop(); // close the connection
+        Parser.Reset(); // Prepare parser for new request
+        digitalWrite(led, LOW);
     }
-
-    // Tell the parser we are done
-    Parser.AllSheWrote();
-    if (Parser.IsValid()) { // Print some debug
-      Serial.println(Parser.MethodString());
-      Serial.println(Parser.Path);
-      Serial.println(Parser.Message);
-    } else
-      Serial.println("We have an error");
-
-    // Answer the client and elaborate actions
-    answerClient(client, Parser);
-
-    delay(1);      // give the web browser time to receive the data
-    client.stop(); // close the connection
-    Parser.Reset(); // Prepare parser for new request
-    digitalWrite(led, LOW);
-  } // end if (client)
 }
 
-void answerClient(EthernetClient &client, HTTPparser & parser) {
 
-  // Web clients make this assumption
-  if (strcmp(parser.Path, "/") == 0)
-    strcpy(parser.Path, "index.htm");
-
-  if (SD.exists(parser.Path)) {
-    webFile = SD.open(parser.Path);        // open web page file
-    if (webFile) {
-      client.println("HTTP/1.1 200 OK");
-      client.println("Content-Type: text/html");
-      client.println("Connection: close");
-      client.println();
-      while (webFile.available()) {
-        client.write(webFile.read()); // send web page to client
-      }
-      webFile.close();
-    }
-  } else {
-    // 404 not found
-  }
-}
 
