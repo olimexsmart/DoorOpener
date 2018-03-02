@@ -27,6 +27,9 @@ void answerClient(EthernetClient & client, HTTPparser & parser) {
                         sendHeaders(200, client, "text/css");
                     } else if (strcmp(format, "ico") == 0) {
                         sendHeaders(200, client, "image/x-icon");
+                    } else if (strcmp(format, "nop") == 0) {
+                        sendHeaders(403, client, NULL);
+                        break;
                     } else {
                         sendHeaders(200, client, "text/plain");
                     }
@@ -45,11 +48,16 @@ void answerClient(EthernetClient & client, HTTPparser & parser) {
 
         case HTTPparser::POST: // Here the code will be pretty specific of the application
             if (strcmp(parser.Path, "/login.ard") == 0) {
-            	// Elaborate the data 
-				
-            	
-                sendHeaders(200, client, NULL);
-                // Send response				               
+                // Elaborate the data
+                if (checkValidity(parser.Message)) {
+                    // Open door here
+                    /////////////////////
+                    sendHeaders(200, client, "text/plain");
+                    client.println(F("valid"));
+                } else {
+                    sendHeaders(423, client, "text/plain");
+                    client.println(F("invalid"));
+                }
             } else {
                 sendHeaders(418, client, NULL);
             }
@@ -70,17 +78,23 @@ void sendHeaders(int code, EthernetClient & client, const char * mime) {
         case 200:
             client.println(F("HTTP/1.1 200 OK"));
             break;
+        case 403:
+            client.println(F("HTTP/1.1 403 Forbidden"));
+            break;            
         case 404:
             client.println(F("HTTP/1.1 404 Not Found"));
             break;
         case 418:
             client.println(F("HTTP/1.1 418 I'm a teapot"));
             break;
+        case 423:
+            client.println(F("HTTP/1.1 423 Locked"));
+            break;
         case 501:
             client.println(F("HTTP/1.1 501 Not Implemented"));
             break;
         case 500:
-            client.println(F("HTTP/1.1 501 Internal Server Error"));
+            client.println(F("HTTP/1.1 500 Internal Server Error"));
             break;
     }
 
@@ -94,7 +108,34 @@ void sendHeaders(int code, EthernetClient & client, const char * mime) {
 }
 
 bool checkValidity(char * credentials) {
-	//File credentials
+    if (!SD.exists("/access.nop"))
+        return false;
+    // Open file with name-key pairs
+    File codes = SD.open("/access.nop");
+    if (!codes)
+        return false;
+
+    char entry[35];
+    byte index = 0;
+    char c;
+    while (codes.available()) {
+        // Get one line at the time from file
+        while ((c = codes.read()) != '\n') { // Once line at a time
+            entry[index] = c;
+            index++;
+            if (index == 35) // Keep index in bounds
+                return false;
+            entry[index] = '\0';
+        }
+        // Only successful exit point
+        //Serial.println(entry);
+        if (strcmp(credentials, entry) == 0)
+            return true;
+
+        index = 0;
+    }
+    // Entry not found
+    return false;
 }
 
 

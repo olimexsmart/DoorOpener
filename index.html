@@ -40,14 +40,14 @@
                         <b>Nome</b>
                     </label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" name="nome" id="nome" placeholder="Nome" data-toggle="tooltip" data-placement="top"
-                            title="Dimmi chi sei">
+                        <input type="text" class="form-control" name="n" id="nome" placeholder="Nome" data-toggle="tooltip" data-placement="top"
+                            title="Lettera iniziale Maiuscola">
                     </div>
                     <label for="key" class="mt-2 col-sm-2 col-form-label">
                         <b>Chiave</b>
                     </label>
                     <div class="mt-2 col-sm-10">
-                        <input type="password" class="form-control" name="key" id="key" placeholder="Chiave" data-toggle="tooltip" data-placement="top"
+                        <input type="password" class="form-control" name="k" id="key" placeholder="Chiave" data-toggle="tooltip" data-placement="top"
                             title="Mi raccomando">
                     </div>
                     <div class="mt-2 col-sm-12 text-center">
@@ -95,7 +95,10 @@
                     data: $('#newsentence').serialize(),
 					timeout: 3000,
 					success: function (result) {
-						console.log(result);
+						console.log("Success:" + result);
+					},
+					error: function (result) {
+						console.log("Error:" + result);
 					}
                 });
                 //alert("Sent");
