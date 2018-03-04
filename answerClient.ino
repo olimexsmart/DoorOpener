@@ -1,13 +1,9 @@
-// The need of a prototype, for all function but not the first one is
-// probably a bug of the Arduino IDE
-void sendHeaders(EthernetClient & client, const char * mime = NULL);
-
-
 void answerClient(EthernetClient & client, HTTPparser & parser) {
 
     switch (parser.Method) {
 
         case HTTPparser::GET:
+            logRequest(HTTPparser::GET, parser.Path, NULL);
             // Web clients make this assumption
             if (strcmp(parser.Path, "/") == 0)
                 strcpy(parser.Path, "index.htm");
@@ -27,10 +23,10 @@ void answerClient(EthernetClient & client, HTTPparser & parser) {
                         sendHeaders(200, client, "text/css");
                     } else if (strcmp(format, "ico") == 0) {
                         sendHeaders(200, client, "image/x-icon");
-                    } else if (strcmp(format, "nop") == 0) {
+                    } /*else if (strcmp(format, "nop") == 0) {
                         sendHeaders(403, client, NULL);
                         break;
-                    } else {
+                    } */else {
                         sendHeaders(200, client, "text/plain");
                     }
                 }
@@ -47,7 +43,9 @@ void answerClient(EthernetClient & client, HTTPparser & parser) {
             break;
 
         case HTTPparser::POST: // Here the code will be pretty specific of the application
-            if (strcmp(parser.Path, "/login.ard") == 0) {
+            logRequest(HTTPparser::POST, parser.Path, parser.Message);
+            // Understand if the request resource is available
+            if (strcmp(parser.Path, "/login.ard") == 0) {	// Login attempt
                 // Elaborate the data
                 if (checkValidity(parser.Message)) {
                     // Open door here
@@ -58,9 +56,18 @@ void answerClient(EthernetClient & client, HTTPparser & parser) {
                     sendHeaders(423, client, "text/plain");
                     client.println(F("invalid"));
                 }
-            } else {
-                sendHeaders(418, client, NULL);
+                break;
+            } else if (strcmp(parser.Path, "/delete.ard") == 0) { // Prevent further logins
+                if (checkValidity(parser.Message)) {
+                    sendHeaders(200, client, "text/plain");
+                    SD.remove("/access.nop");	// Without the file is not possible to login
+                } else {
+                    sendHeaders(423, client, "text/plain");
+                }
+                break;
             }
+            // Otherwise send a funny error response
+            sendHeaders(418, client, NULL);
             break;
 
         default:
@@ -80,7 +87,7 @@ void sendHeaders(int code, EthernetClient & client, const char * mime) {
             break;
         case 403:
             client.println(F("HTTP/1.1 403 Forbidden"));
-            break;            
+            break;
         case 404:
             client.println(F("HTTP/1.1 404 Not Found"));
             break;
@@ -107,35 +114,6 @@ void sendHeaders(int code, EthernetClient & client, const char * mime) {
     client.println();
 }
 
-bool checkValidity(char * credentials) {
-    if (!SD.exists("/access.nop"))
-        return false;
-    // Open file with name-key pairs
-    File codes = SD.open("/access.nop");
-    if (!codes)
-        return false;
 
-    char entry[35];
-    byte index = 0;
-    char c;
-    while (codes.available()) {
-        // Get one line at the time from file
-        while ((c = codes.read()) != '\n') { // Once line at a time
-            entry[index] = c;
-            index++;
-            if (index == 35) // Keep index in bounds
-                return false;
-            entry[index] = '\0';
-        }
-        // Only successful exit point
-        //Serial.println(entry);
-        if (strcmp(credentials, entry) == 0)
-            return true;
-
-        index = 0;
-    }
-    // Entry not found
-    return false;
-}
 
 
