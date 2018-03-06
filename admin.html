@@ -54,23 +54,43 @@
             <form id="newsentence" method="post">
                 <!-- Text inputs -->
                 <div class="form-group row">
-                    <label for="nome" class="col-sm-2 col-form-label">
-                        <b>Nome</b>
+					<!-- Administrator inputs -->
+                    <label for="n" class="col-sm-2 col-form-label adminname" id="">
+                        <b>Admin</b>
                     </label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" name="n" id="nome" placeholder="Nome" data-toggle="tooltip" data-placement="top"
+                    <div class="col-sm-10 adminname">
+                        <input type="text" class="form-control" name="n" id="nome" placeholder="Nome Admin" data-toggle="tooltip" data-placement="top"
                             title="Lettera iniziale Maiuscola">
                     </div>
-                    <label for="key" class="mt-2 col-sm-2 col-form-label">
-                        <b>Chiave</b>
+                    <label for="k" class="mt-2 col-sm-2 col-form-label adminpassword">
+                        <b>Password</b>
                     </label>
-                    <div class="mt-2 col-sm-10">
-                        <input type="password" class="form-control" name="k" id="key" placeholder="Chiave" data-toggle="tooltip" data-placement="top"
+                    <div class="mt-2 col-sm-10 adminpassword">
+                        <input type="password" class="form-control" name="k" id="key" placeholder="Chiave Admin" data-toggle="tooltip" data-placement="top"
                             title="Mi raccomando">
                     </div>
+					
+					<!-- User inputs -->
+                    <label for="un" class="mt-2 col-sm-2 col-form-label username">
+                        <b>User</b>
+                    </label>
+                    <div class="mt-2 col-sm-10 username">
+                        <input type="text" class="form-control" name="un" id="usernome" placeholder="Nome Utente" data-toggle="tooltip" data-placement="top"
+                            title="Lettera iniziale Maiuscola">
+                    </div>
+                    <label for="uk" class="mt-2 col-sm-2 col-form-label userpassword">
+                        <b>Password</b>
+                    </label>
+                    <div class="mt-2 col-sm-10 userpassword">
+                        <input type="password" class="form-control" name="uk" id="userkey" placeholder="Chiave Utente" data-toggle="tooltip" data-placement="top"
+                            title="Mi raccomando">
+                    </div>					
+					
+					
+					<!-- Confirm button -->
                     <div class="mt-2 col-sm-12 text-center">
                         <button type="button" class="btn btn-success btn-lg btn-block" data-toggle="tooltip" data-placement="bottom" title="Daje"
-                            id="submit">Prova un po'</button>
+                            id="submit">Agisci</button>
                     </div>
                 </div>
             </form>
@@ -120,15 +140,46 @@
 	<div id="loader"></div>
 
     <script>
+		res = [];
         $(function () {
             $('[data-toggle="tooltip"]').tooltip();
 			$('#radio3')[0].checked = true;
+			// Modifing the visibility of the UI
+			// elements depending on the desired action
+			$('#radio1').on('change', function () {
+				$('.adminname').show();
+				$('.adminpassword').show();
+				$('.username').hide();
+				$('.userpassword').hide();
+				res = "revokeAll.ard";
+			});
+			$('#radio2').on('change', function () {
+				$('.adminname').show();
+				$('.adminpassword').show();
+				$('.username').show();
+				$('.userpassword').hide();
+				res = "revoke.ard"
+			});
+			$('#radio3').on('change', function () {
+				$('.adminname').show();
+				$('.adminpassword').show();
+				$('.username').show();
+				$('.userpassword').show();
+				res = "add.ard";
+			});
+			$('#radio4').on('change', function () {
+				$('.adminname').hide();
+				$('.adminpassword').hide();
+				$('.username').show();
+				$('.userpassword').show();
+				res = "check.ard";
+			});
 			
 			
 			//handle = null;
             $('#submit').click(function () {
                 $.ajax({
-                    url: "login.ard",
+                    url: res,
                     method: "POST",
                     dataType: "text",
                     data: $('#newsentence').serialize(),

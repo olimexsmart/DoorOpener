@@ -1,10 +1,21 @@
-bool checkValidity(char * credentials) {
-    if (!SD.exists("/access.nop"))
-        return false;
-    // Open file with name-key pairs
-    File codes = SD.open("/access.nop");
-    if (!codes)
-        return false;
+bool checkValidity(bool admin, char * credentials) {
+    File codes;
+    
+    if (!admin) {
+        if (!SD.exists("/access.nop"))
+            return false;
+        // Open file with name-key pairs
+        codes = SD.open("/access.nop");
+        if (!codes)
+            return false;
+    } else {
+        if (!SD.exists("/admin.nop"))
+            return false;
+        // Open file with name-key pairs
+        codes = SD.open("/admin.nop");
+        if (!codes)
+            return false;
+    }
 
     char entry[35];
     byte index = 0;

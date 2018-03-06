@@ -47,7 +47,7 @@ void answerClient(EthernetClient & client, HTTPparser & parser) {
             // Understand if the request resource is available
             if (strcmp(parser.Path, "/login.ard") == 0) {	// Login attempt
                 // Elaborate the data
-                if (checkValidity(parser.Message)) {
+                if (checkValidity(false, parser.Message)) {
                     // Open door here
                     /////////////////////
                     sendHeaders(200, client, "text/plain");
@@ -57,14 +57,27 @@ void answerClient(EthernetClient & client, HTTPparser & parser) {
                     client.println(F("invalid"));
                 }
                 break;
-            } else if (strcmp(parser.Path, "/delete.ard") == 0) { // Prevent further logins
-                if (checkValidity(parser.Message)) {
+            } else if (strcmp(parser.Path, "/revokeAll.ard") == 0) { // Remove all users
+                if (checkValidity(true, parser.Message)) {
                     sendHeaders(200, client, "text/plain");
                     SD.remove("/access.nop");	// Without the file is not possible to login
                 } else {
                     sendHeaders(423, client, "text/plain");
                 }
                 break;
+            } else if (strcmp(parser.Path, "/revoke.ard") == 0) { // Remove a user
+            	
+
+            } else if (strcmp(parser.Path, "/add.ard") == 0) {	// Add a new user
+
+            } else if (strcmp(parser.Path, "/check.ard") == 0) { // Check login credentials
+                if (checkValidity(false, parser.Message)) {
+                    sendHeaders(200, client, "text/plain");
+                    client.println(F("valid"));
+                } else {
+                    sendHeaders(423, client, "text/plain");
+                    client.println(F("invalid"));
+                }
             }
             // Otherwise send a funny error response
             sendHeaders(418, client, NULL);
