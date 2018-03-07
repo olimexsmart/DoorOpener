@@ -115,13 +115,11 @@
                     dataType: "text",
                     data: $('#newsentence').serialize(),
 					timeout: 3000,
-					success: function (result) {
-						console.log("Success:" + result);
+					success: function (result) {						
 						$('#loader').hide();
 						$('#open').modal();						
 					},
-					error: function (result) {
-						console.log("Error:" + result);
+					error: function (result) {						
 						$('#loader').hide();
 						$('#close').modal();						
 					}

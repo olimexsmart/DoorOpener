@@ -40,13 +40,15 @@
 					<legend class="col-form-legend col-sm-2"><b>Azione</b></legend>
 					<div class="btn-group col-sm-10" data-toggle="buttons">
 						<label class="btn btn-secondary">
-							<input type="radio" name="action" id="radio1" value="revokeAll" autocomplete="off">Blocca</label>
+							<input type="radio" name="action" id="radio1" value="lock" autocomplete="off">Blocca</label>
 						<label class="btn btn-secondary">
+							<input type="radio" name="action" id="radio1bis" value="revokeAll" autocomplete="off">Rimuovi Tutti</label>
+						<label class="btn btn-secondary">						
 							<input type="radio" name="action" id="radio2" value="revoke" autocomplete="off">Rimuovi</label>
 						<label class="btn btn-secondary active">
 							<input type="radio" name="action" id="radio3" value="add" autocomplete="off">Aggiungi</label>
 						<label class="btn btn-secondary">
-							<input type="radio" name="action" id="radio4" value="check">Prova</label>
+							<input type="radio" name="action" id="radio4" value="check" autocomplete="off">Prova</label>
 					</div>
 				</div>
 			</fieldset>
@@ -55,34 +57,34 @@
                 <!-- Text inputs -->
                 <div class="form-group row">
 					<!-- Administrator inputs -->
-                    <label for="n" class="col-sm-2 col-form-label adminname" id="">
+                    <label for="nome" class="col-sm-2 col-form-label adminname" id="">
                         <b>Admin</b>
                     </label>
                     <div class="col-sm-10 adminname">
-                        <input type="text" class="form-control" name="n" id="nome" placeholder="Nome Admin" data-toggle="tooltip" data-placement="top"
+                        <input type="text" class="form-control" name="an" id="nome" placeholder="Nome Admin" data-toggle="tooltip" data-placement="top"
                             title="Lettera iniziale Maiuscola">
                     </div>
-                    <label for="k" class="mt-2 col-sm-2 col-form-label adminpassword">
+                    <label for="key" class="mt-2 col-sm-2 col-form-label adminpassword">
                         <b>Password</b>
                     </label>
                     <div class="mt-2 col-sm-10 adminpassword">
-                        <input type="password" class="form-control" name="k" id="key" placeholder="Chiave Admin" data-toggle="tooltip" data-placement="top"
+                        <input type="password" class="form-control" name="ak" id="key" placeholder="Chiave Admin" data-toggle="tooltip" data-placement="top"
                             title="Mi raccomando">
                     </div>
 					
 					<!-- User inputs -->
-                    <label for="un" class="mt-2 col-sm-2 col-form-label username">
+                    <label for="usernome" class="mt-2 col-sm-2 col-form-label username">
                         <b>User</b>
                     </label>
                     <div class="mt-2 col-sm-10 username">
-                        <input type="text" class="form-control" name="un" id="usernome" placeholder="Nome Utente" data-toggle="tooltip" data-placement="top"
+                        <input type="text" class="form-control" name="n" id="usernome" placeholder="Nome Utente" data-toggle="tooltip" data-placement="top"
                             title="Lettera iniziale Maiuscola">
                     </div>
-                    <label for="uk" class="mt-2 col-sm-2 col-form-label userpassword">
+                    <label for="userkey" class="mt-2 col-sm-2 col-form-label userpassword">
                         <b>Password</b>
                     </label>
                     <div class="mt-2 col-sm-10 userpassword">
-                        <input type="password" class="form-control" name="uk" id="userkey" placeholder="Chiave Utente" data-toggle="tooltip" data-placement="top"
+                        <input type="password" class="form-control" name="k" id="userkey" placeholder="Chiave Utente" data-toggle="tooltip" data-placement="top"
                             title="Mi raccomando">
                     </div>					
 					
@@ -97,109 +99,109 @@
         </div>
     </div>
 
-    <!-- Modal open -->
-    <div class="modal fade" id="open" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
+    <!-- Modal correctly completed -->
+    <div class="modal fade" id="completed" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="thanksLabel">Ma che bravo!</h5>
+                    <h5 class="modal-title" id="thanksLabel">Ottimo!</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    Vieni su, a pra foco caro!
+                    Le modifiche sono state attuate!
                 </div>
                 <div class="modal-footer">
-                    <a href="http://vabbuo.it" class="mt-2 btn btn-success" data-toggle="tooltip" data-placement="left" title="Vabbuò dai guardati ancora due frasi">Dai entra</a>
+                    <button type="button" class="btn btn-success" data-dismiss="modal">Fai dell'altro</button>
                 </div>
             </div>
         </div>
     </div>
 	
-    <!-- Modal close -->
-    <div class="modal fade" id="close" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
+    <!-- Modal locked -->
+    <div class="modal fade" id="locked" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="thanksLabel">Che coraggio!</h5>
+                    <h5 class="modal-title" id="thanksLabel">Sistema bloccato!</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    Ma ti è andata male, riprova un po' dai. Ricordati che il cognome deve cominciare con la maiuscola, come ti insegnavano alle elementari.
+                    Dovrai sbloccarlo dinuovo perché qualcuno possa entrare
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Riprova belin</button>
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Bene</button>
+                </div>
+            </div>
+        </div>
+    </div>	
+	
+    <!-- Modal forbidden -->
+    <div class="modal fade" id="forbidden" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="thanksLabel">Ahia!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Hai sbagliato a scrivere qualcosa, almeno spero
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Riprova</button>
+                </div>
+            </div>
+        </div>
+    </div>		
+	
+    <!-- Modal tooMany -->
+    <div class="modal fade" id="tooMany" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="thanksLabel">Malissimo!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Le credenziali sono state sbagliate troppe volte, devi aspettare un po' di tempo prima di riprovare
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Aspetterò</button>
                 </div>
             </div>
         </div>
     </div>	
 
+    <!-- Modal generic -->
+    <div class="modal fade" id="default" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="thanksLabel">Boh?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Qualcosa è andato storto ma non saprei cosa
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Vabbuò</button>
+                </div>
+            </div>
+        </div>
+    </div>			
+
 	<div id="loader"></div>
 
-    <script>
-		res = [];
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip();
-			$('#radio3')[0].checked = true;
-			// Modifing the visibility of the UI
-			// elements depending on the desired action
-			$('#radio1').on('change', function () {
-				$('.adminname').show();
-				$('.adminpassword').show();
-				$('.username').hide();
-				$('.userpassword').hide();
-				res = "revokeAll.ard";
-			});
-			$('#radio2').on('change', function () {
-				$('.adminname').show();
-				$('.adminpassword').show();
-				$('.username').show();
-				$('.userpassword').hide();
-				res = "revoke.ard"
-			});
-			$('#radio3').on('change', function () {
-				$('.adminname').show();
-				$('.adminpassword').show();
-				$('.username').show();
-				$('.userpassword').show();
-				res = "add.ard";
-			});
-			$('#radio4').on('change', function () {
-				$('.adminname').hide();
-				$('.adminpassword').hide();
-				$('.username').show();
-				$('.userpassword').show();
-				res = "check.ard";
-			});
-			
-			
-			//handle = null;
-            $('#submit').click(function () {
-                $.ajax({
-                    url: res,
-                    method: "POST",
-                    dataType: "text",
-                    data: $('#newsentence').serialize(),
-					timeout: 3000,
-					success: function (result) {
-						console.log("Success:" + result);
-						$('#loader').hide();
-						$('#open').modal();						
-					},
-					error: function (result) {
-						console.log("Error:" + result);
-						$('#loader').hide();
-						$('#close').modal();						
-					}
-                });
-                //alert("Sent");                
-				$('#loader').show();
-            });
-        })
-    </script>
+    <script src="admin.js"></script>
 </body>
 
 </html>

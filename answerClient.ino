@@ -1,19 +1,23 @@
-void answerClient(EthernetClient & client, HTTPparser & parser) {
+/*
+    This function takes no arguments because it' just for code readability.
+    This code would be too long to be directly written in the main loop.
+*/
+void answerClient() {
 
-    switch (parser.Method) {
+    switch (Parser.Method) {
 
         case HTTPparser::GET:
-            logRequest(HTTPparser::GET, parser.Path, NULL);
+            logRequest(HTTPparser::GET, Parser.Path, NULL);
             // Web clients make this assumption
-            if (strcmp(parser.Path, "/") == 0)
-                strcpy(parser.Path, "index.htm");
+            if (strcmp(Parser.Path, "/") == 0)
+                strcpy(Parser.Path, "index.htm");
             // Check if we have the file
-            if (SD.exists(parser.Path)) {
-                webFile = SD.open(parser.Path);   // open web page file
+            if (SD.exists(Parser.Path)) {
+                webFile = SD.open(Parser.Path);   // open web page file
                 // Detect format
                 {   // Scoping brackets since in switch statements these declarations
                     // would pollute other cases
-                    char * point = strrchr(parser.Path, '.');
+                    char * point = strrchr(Parser.Path, '.');
                     char format[5];
                     strcpy(format, point + 1);
                     // Here there should be a general mapping of format-MIMI types
@@ -21,17 +25,19 @@ void answerClient(EthernetClient & client, HTTPparser & parser) {
                         sendHeaders(200, client, "text/html");
                     } else if (strcmp(format, "css") == 0) {
                         sendHeaders(200, client, "text/css");
+                    } else if (strcmp(format, "js") == 0) {
+                        sendHeaders(200, client, "text/javascript");
                     } else if (strcmp(format, "ico") == 0) {
                         sendHeaders(200, client, "image/x-icon");
                     } /*else if (strcmp(format, "nop") == 0) {
                         sendHeaders(403, client, NULL);
-                        break;
+                        break; // Break from GET
                     } */else {
                         sendHeaders(200, client, "text/plain");
                     }
                 }
             } else {	// 404 landing page
-                strcpy(parser.Path, "404.htm");
+                strcpy(Parser.Path, "404.htm");
                 webFile = SD.open("404.htm");
                 sendHeaders(404, client, "text/html");
             }
@@ -40,53 +46,70 @@ void answerClient(EthernetClient & client, HTTPparser & parser) {
                 client.write(webFile.read()); // send web page to client
             }
             webFile.close();
-            break;
+            break;	// Break from GET
 
         case HTTPparser::POST: // Here the code will be pretty specific of the application
-            logRequest(HTTPparser::POST, parser.Path, parser.Message);
-            // Understand if the request resource is available
-            if (strcmp(parser.Path, "/login.ard") == 0) {	// Login attempt
-                // Elaborate the data
-                if (checkValidity(false, parser.Message)) {
-                    // Open door here
-                    /////////////////////
-                    sendHeaders(200, client, "text/plain");
-                    client.println(F("valid"));
-                } else {
-                    sendHeaders(423, client, "text/plain");
-                    client.println(F("invalid"));
-                }
-                break;
-            } else if (strcmp(parser.Path, "/revokeAll.ard") == 0) { // Remove all users
-                if (checkValidity(true, parser.Message)) {
-                    sendHeaders(200, client, "text/plain");
-                    SD.remove("/access.nop");	// Without the file is not possible to login
-                } else {
-                    sendHeaders(423, client, "text/plain");
-                }
-                break;
-            } else if (strcmp(parser.Path, "/revoke.ard") == 0) { // Remove a user
-            	
+            logRequest(HTTPparser::POST, Parser.Path, Parser.Message);
+            {   // Understand if the request resource is available
+                int statusCode = 418; // This will remain unchanged if resource requested is unknown
 
-            } else if (strcmp(parser.Path, "/add.ard") == 0) {	// Add a new user
+                // Login attempt
+                if (strcmp(Parser.Path, "/login.ard") == 0) {
+                    if (checkValidity(false, Parser.Message) && !tooManyAttempts && !locked) {
+                        // Open door here
+                        /////////////////////
+                        statusCode = 200;
+                    } else
+                        statusCode = tooManyAttempts ? 429 : (locked ? 423 : 403);
 
-            } else if (strcmp(parser.Path, "/check.ard") == 0) { // Check login credentials
-                if (checkValidity(false, parser.Message)) {
-                    sendHeaders(200, client, "text/plain");
-                    client.println(F("valid"));
-                } else {
-                    sendHeaders(423, client, "text/plain");
-                    client.println(F("invalid"));
+                    // Lock access
+                } else if (strcmp(Parser.Path, "/lock.ard") == 0) {
+                    if (checkValidity(true, Parser.Message) && !tooManyAttempts) {
+                        locked = !locked; // Toggle the locked status
+                        statusCode = locked ? 423 : 200;
+                    } else
+                        statusCode = tooManyAttempts ? 429 : 403;
+
+                    // Remove all users
+                } else if (strcmp(Parser.Path, "/revokeAll.ard") == 0) {
+                    if (checkValidity(true, Parser.Message) && !tooManyAttempts) {
+                        statusCode = 200;
+                        SD.remove("/access.nop");	// Without the file is not possible to login
+                    } else
+                        statusCode = tooManyAttempts ? 429 : 403;
+
+                    // Remove one particular user
+                } else if (strcmp(Parser.Path, "/revoke.ard") == 0) { 
+                    if (checkValidity(false, Parser.Message) && !tooManyAttempts) {
+                        statusCode = 200;
+                    } else
+                        statusCode = tooManyAttempts ? 429 : 403;
+
+                    // Add a user
+                } else if (strcmp(Parser.Path, "/add.ard") == 0) {	
+                    if (checkValidity(false, Parser.Message) && !tooManyAttempts) {
+                        statusCode = 200;
+                    } else
+                        statusCode = tooManyAttempts ? 429 : 403;
+
+                    // Check the validity of user credentials
+                } else if (strcmp(Parser.Path, "/check.ard") == 0) { 
+                    if (checkValidity(false, Parser.Message) && !tooManyAttempts) {
+                        statusCode = 200;
+                    } else
+                        statusCode = tooManyAttempts ? 429 : 403;
                 }
+
+
+                // Send the HTTP response headers
+                sendHeaders(statusCode, client, NULL);
             }
-            // Otherwise send a funny error response
-            sendHeaders(418, client, NULL);
-            break;
+            break; // Break from POST
 
         default:
             // 501 not implemented
             sendHeaders(501, client, NULL);
-            break;
+            break; // Break from default
     }
 }
 
@@ -109,6 +132,9 @@ void sendHeaders(int code, EthernetClient & client, const char * mime) {
             break;
         case 423:
             client.println(F("HTTP/1.1 423 Locked"));
+            break;
+        case 429:
+            client.println(F("HTTP/1.1 429 Too Many Requests"));
             break;
         case 501:
             client.println(F("HTTP/1.1 501 Not Implemented"));
