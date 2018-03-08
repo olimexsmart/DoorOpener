@@ -17,14 +17,14 @@ byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 IPAddress ip(192, 168, 1, 33); // IP address, may need to change depending on network
 EthernetServer server(80);  // create a server at port 80
 EthernetClient client;
-HTTPparser Parser(20, 50);
+HTTPparser Parser(15, 50);
 
 File webFile;
 // Too any attempts variables
 bool tooManyAttempts = false;
 bool locked = false;
 unsigned long t;
-byte attempts;
+byte attempts = 0;
 
 void setup()
 {
@@ -56,8 +56,12 @@ void loop()
 {
     // Too many attempts check
     tooManyAttempts = attempts > 2 ? true : false;
-    // Longer interval if tooManyAttempts
-    if ((tooManyAttempts && millis() - t > 30000) || (!tooManyAttempts && millis() - t > 10000)) {
+    /* 
+     * Longer interval if tooManyAttempts 
+     * If attempts is bigger than zero after 10 seconds decrease it a bit, 
+     * only if we are not already over the max number of attempts
+     */
+    if ((tooManyAttempts && millis() - t > 30000) || (attempts > 0 && !tooManyAttempts && millis() - t > 10000)) {
         attempts--;
         t = millis();
     }

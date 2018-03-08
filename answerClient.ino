@@ -7,7 +7,7 @@ void answerClient() {
     switch (Parser.Method) {
 
         case HTTPparser::GET:
-            logRequest(HTTPparser::GET, Parser.Path, NULL);
+            logRequest(webFile, HTTPparser::GET, Parser.Path, NULL);
             // Web clients make this assumption
             if (strcmp(Parser.Path, "/") == 0)
                 strcpy(Parser.Path, "index.htm");
@@ -49,13 +49,13 @@ void answerClient() {
             break;	// Break from GET
 
         case HTTPparser::POST: // Here the code will be pretty specific of the application
-            logRequest(HTTPparser::POST, Parser.Path, Parser.Message);
+            logRequest(webFile, HTTPparser::POST, Parser.Path, Parser.Message);
             {   // Understand if the request resource is available
                 int statusCode = 418; // This will remain unchanged if resource requested is unknown
 
                 // Login attempt
-                if (strcmp(Parser.Path, "/login.ard") == 0) {
-                    if (checkValidity(false, Parser.Message) && !tooManyAttempts && !locked) {
+                if (strcmp(Parser.Path, "/login.ard") == 0) {                                        
+                    if (checkValidity(webFile, false, Parser.Message, false) && !tooManyAttempts && !locked) {
                         // Open door here
                         /////////////////////
                         statusCode = 200;
@@ -64,7 +64,7 @@ void answerClient() {
 
                     // Lock access
                 } else if (strcmp(Parser.Path, "/lock.ard") == 0) {
-                    if (checkValidity(true, Parser.Message) && !tooManyAttempts) {
+                    if (checkValidity(webFile, true, Parser.Message, false) && !tooManyAttempts) {
                         locked = !locked; // Toggle the locked status
                         statusCode = locked ? 423 : 200;
                     } else
@@ -72,29 +72,41 @@ void answerClient() {
 
                     // Remove all users
                 } else if (strcmp(Parser.Path, "/revokeAll.ard") == 0) {
-                    if (checkValidity(true, Parser.Message) && !tooManyAttempts) {
+                    if (checkValidity(webFile, true, Parser.Message, false) && !tooManyAttempts) {
                         statusCode = 200;
                         SD.remove("/access.nop");	// Without the file is not possible to login
                     } else
                         statusCode = tooManyAttempts ? 429 : 403;
 
                     // Remove one particular user
-                } else if (strcmp(Parser.Path, "/revoke.ard") == 0) { 
-                    if (checkValidity(false, Parser.Message) && !tooManyAttempts) {
-                        statusCode = 200;
+                } else if (strcmp(Parser.Path, "/revoke.ard") == 0) {
+                    if (checkValidity(webFile, false, Parser.Message, true) && !tooManyAttempts) {
+                        statusCode = 200; // Is successful the line is invalidated, mind the true parameter
                     } else
                         statusCode = tooManyAttempts ? 429 : 403;
 
                     // Add a user
-                } else if (strcmp(Parser.Path, "/add.ard") == 0) {	
-                    if (checkValidity(false, Parser.Message) && !tooManyAttempts) {
-                        statusCode = 200;
+                } else if (strcmp(Parser.Path, "/add.ard") == 0) {
+                    // Split the string between administrator and user part
+                    char * c = strstr(Parser.Message, "&n=");
+                    char admin[25];
+                    char user[25];
+                    strncpy(admin, Parser.Message, c - Parser.Message);
+                    admin[c - Parser.Message] = '\0';
+                    Serial.println(admin);
+                    strcpy(user, c + 1);
+                    Serial.println(user);
+                    if (checkValidity(webFile, true, admin, false) && !tooManyAttempts) {
+                        if (addUser(webFile, user))
+                            statusCode = 200;
+                        else
+                            statusCode = 500;
                     } else
                         statusCode = tooManyAttempts ? 429 : 403;
 
                     // Check the validity of user credentials
-                } else if (strcmp(Parser.Path, "/check.ard") == 0) { 
-                    if (checkValidity(false, Parser.Message) && !tooManyAttempts) {
+                } else if (strcmp(Parser.Path, "/check.ard") == 0) {
+                    if (checkValidity(webFile, false, Parser.Message, false) && !tooManyAttempts) {
                         statusCode = 200;
                     } else
                         statusCode = tooManyAttempts ? 429 : 403;
@@ -116,31 +128,32 @@ void answerClient() {
 
 // Constant arguments declared only in the prototype
 void sendHeaders(int code, EthernetClient & client, const char * mime) {
+	client.print(F("HTTP/1.1 "));
     // Sent some HTTP headers
     switch (code) {
         case 200:
-            client.println(F("HTTP/1.1 200 OK"));
+            client.println(F("200 OK"));
             break;
         case 403:
-            client.println(F("HTTP/1.1 403 Forbidden"));
+            client.println(F("403 Forbidden"));
             break;
         case 404:
-            client.println(F("HTTP/1.1 404 Not Found"));
+            client.println(F("404 Not Found"));
             break;
         case 418:
-            client.println(F("HTTP/1.1 418 I'm a teapot"));
+            client.println(F("418 I'm a teapot"));
             break;
         case 423:
-            client.println(F("HTTP/1.1 423 Locked"));
+            client.println(F("423 Locked"));
             break;
         case 429:
-            client.println(F("HTTP/1.1 429 Too Many Requests"));
+            client.println(F("429 Too Many Requests"));
             break;
         case 501:
-            client.println(F("HTTP/1.1 501 Not Implemented"));
+            client.println(F("501 Not Implemented"));
             break;
         case 500:
-            client.println(F("HTTP/1.1 500 Internal Server Error"));
+            client.println(F("500 Internal Server Error"));
             break;
     }
 

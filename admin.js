@@ -19,8 +19,8 @@ $(function () {
 		res = "revokeAll.ard";
 	});			
 	$('#radio2').on('change', function () {
-		$('.adminname').show();
-		$('.adminpassword').show();
+		$('.adminname').hide();
+		$('.adminpassword').hide();
 		$('.username').show();
 		$('.userpassword').show();
 		res = "revoke.ard"
