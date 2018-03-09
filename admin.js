@@ -2,6 +2,7 @@ res = [];
 $(function () {
 	$('[data-toggle="tooltip"]').tooltip();
 	$('#radio3')[0].checked = true;
+	res = "add.ard";
 	// Modifing the visibility of the UI
 	// elements depending on the desired action
 	$('#radio1').on('change', function () {

@@ -57,7 +57,7 @@ void answerClient() {
                 if (strcmp(Parser.Path, "/login.ard") == 0) {                                        
                     if (checkValidity(webFile, false, Parser.Message, false) && !tooManyAttempts && !locked) {
                         // Open door here
-                        /////////////////////
+                        open = true;
                         statusCode = 200;
                     } else
                         statusCode = tooManyAttempts ? 429 : (locked ? 423 : 403);
@@ -88,14 +88,13 @@ void answerClient() {
                     // Add a user
                 } else if (strcmp(Parser.Path, "/add.ard") == 0) {
                     // Split the string between administrator and user part
-                    char * c = strstr(Parser.Message, "&n=");
-                    char admin[25];
-                    char user[25];
-                    strncpy(admin, Parser.Message, c - Parser.Message);
-                    admin[c - Parser.Message] = '\0';
-                    Serial.println(admin);
-                    strcpy(user, c + 1);
-                    Serial.println(user);
+                    char * user = strstr(Parser.Message, "&n=");
+                    user++; // We don't want the & amperstand
+                    byte offset = user - Parser.Message; // Offset of where the user part starts
+                    char * admin = (char * ) malloc(offset + 1);                    
+                    strncpy(admin, Parser.Message, offset - 1);
+                    admin[offset] = '\0';
+                    Serial.println(admin); 
                     if (checkValidity(webFile, true, admin, false) && !tooManyAttempts) {
                         if (addUser(webFile, user))
                             statusCode = 200;
@@ -104,6 +103,8 @@ void answerClient() {
                     } else
                         statusCode = tooManyAttempts ? 429 : 403;
 
+					free(admin);
+										
                     // Check the validity of user credentials
                 } else if (strcmp(Parser.Path, "/check.ard") == 0) {
                     if (checkValidity(webFile, false, Parser.Message, false) && !tooManyAttempts) {

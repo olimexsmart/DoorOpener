@@ -19,7 +19,9 @@ bool checkValidity(File &codes, bool admin, char * credentials, bool revoke) {
             return false;
     }
 
-    char entry[25];
+	byte len = strlen(credentials);
+	len++;
+    char * entry = (char *) malloc(len);
     byte index = 0;
     char c;
     while (codes.available()) {
@@ -27,14 +29,14 @@ bool checkValidity(File &codes, bool admin, char * credentials, bool revoke) {
         while ((c = codes.read()) != '\n') { // Once line at a time
             entry[index] = c;
             index++;
-            if (index == 25) { // Keep index in bounds
+            if (index == len) { // Keep index in bounds
+            	free(entry);
                 codes.close();
                 return false;
             }
             entry[index] = '\0';
-        }
-        /*
-        Serial.println(entry);
+        }       
+/*        Serial.println(entry);
         for (byte i = 0; i < strlen(entry); i++) {
         	Serial.print((byte) entry[i]);
         	Serial.print(" ");
@@ -44,7 +46,7 @@ bool checkValidity(File &codes, bool admin, char * credentials, bool revoke) {
         	Serial.print((byte) credentials[i]);
         	Serial.print(" ");
         }        
-        Serial.println();*/
+        Serial.println(); */
         if (strcmp(credentials, entry) == 0) {
             if (revoke) {
                 // Get current position to reopen file in write mode
@@ -54,13 +56,16 @@ bool checkValidity(File &codes, bool admin, char * credentials, bool revoke) {
                 codes.seek(pos - 4); // 3 chars before \n
                 codes.println("###"); // Invalidating line, the \n is overwritten
             }
+            free(entry);
             codes.close();
             return true; // Only successful exit point
         }
         index = 0;
     }
-    // Entry not found
-    codes.close();
+
+   	free(entry);
+    // Entry not found    
+    codes.close();    
     return false;
 }
 
@@ -79,16 +84,6 @@ bool addUser(File &codes, char * entry) {
 }
 
 void logRequest(File &logf, HTTPparser::MethodType method, char * path, char * message) {
-    char buff[50];
-    strcpy(buff, path);
-
-    if (message) {
-        byte l = strlen(buff);
-        buff[l] = '\t';
-        buff[l + 1] = '\0';
-        strcat(buff, message);
-    }
-
     //File logf;
     switch (method) {
         case HTTPparser::GET:
@@ -106,8 +101,19 @@ void logRequest(File &logf, HTTPparser::MethodType method, char * path, char * m
     if (!logf) // If error of some sort
         return;
 
-    logf.write(buff, strlen(buff));
+    logf.write(path, strlen(path));
+    logf.write('\t');
+    logf.write(message, strlen(message));
     logf.println();
 
     logf.close();
 }
+
+void openDoor() {
+	digitalWrite(ledOpen, HIGH);
+	digitalWrite(opening, LOW);
+	delay(1500);
+	digitalWrite(ledOpen, LOW);
+	digitalWrite(opening, HIGH);
+}
+
