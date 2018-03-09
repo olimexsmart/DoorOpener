@@ -5,7 +5,7 @@
 */
 bool checkValidity(File &codes, bool admin, char * credentials, bool revoke) {
     //File codes;
-	Serial.println(FreeRam());
+	//Serial.println(FreeRam());
     if (!admin) {
         // Open file with name-key pairs
         codes = SD.open("/access.nop");
@@ -33,7 +33,7 @@ bool checkValidity(File &codes, bool admin, char * credentials, bool revoke) {
             }
             entry[index] = '\0';
         }
-        // Only successful exit point
+        /*
         Serial.println(entry);
         for (byte i = 0; i < strlen(entry); i++) {
         	Serial.print((byte) entry[i]);
@@ -44,7 +44,7 @@ bool checkValidity(File &codes, bool admin, char * credentials, bool revoke) {
         	Serial.print((byte) credentials[i]);
         	Serial.print(" ");
         }        
-        Serial.println();
+        Serial.println();*/
         if (strcmp(credentials, entry) == 0) {
             if (revoke) {
                 // Get current position to reopen file in write mode
@@ -55,7 +55,7 @@ bool checkValidity(File &codes, bool admin, char * credentials, bool revoke) {
                 codes.println("###"); // Invalidating line, the \n is overwritten
             }
             codes.close();
-            return true;
+            return true; // Only successful exit point
         }
         index = 0;
     }

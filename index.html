@@ -28,7 +28,8 @@
                     <h4 class="card-title">Apriti Sesamo!</h4>
                     <p class="card-text">Mica ti aspettavi che cliccavi su qualcosa ed era fatta?</p>
                     <a href="http://vabbuo.it" class="mt-2 btn btn-success" data-toggle="tooltip" data-placement="left" title="Vabbuò dai guardati ancora due frasi">vabbuo.it</a>
-                    <a href="http://olimexsmart.it" class="mt-2 btn btn-danger" data-toggle="tooltip" data-placement="bottom" title="Scopri tutta la storia, in inglese">olimexsmart.it</a>
+                    <a href="http://olimexsmart.it" class="mt-2 btn btn-primary" data-toggle="tooltip" data-placement="bottom" title="Scopri tutta la storia, in inglese">olimexsmart.it</a>
+					<a href="/admin.htm" class="mt-2 btn btn-danger" data-toggle="tooltip" data-placement="bottom" title="Smanetta">Amministrazione</a>
                 </div>
             </div>
 
@@ -44,10 +45,10 @@
                         <input type="text" class="form-control" name="n" id="nome" placeholder="Nome" data-toggle="tooltip" data-placement="top"
                             title="Lettera iniziale Maiuscola">
                     </div>
-                    <label for="k" class="col-sm-2 col-form-label">
+                    <label for="k" class="mt-2 col-sm-2 col-form-label">
                         <b>Chiave</b>
                     </label>
-                    <div class="col-sm-10">
+                    <div class="mt-2 col-sm-10">
                         <input type="password" class="form-control" name="k" id="key" placeholder="Chiave" data-toggle="tooltip" data-placement="top"
                             title="Mi raccomando">
                     </div>
@@ -80,25 +81,86 @@
         </div>
     </div>
 	
-    <!-- Modal close -->
-    <div class="modal fade" id="close" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
+    <!-- Modal locked -->
+    <div class="modal fade" id="locked" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="thanksLabel">Che coraggio!</h5>
+                    <h5 class="modal-title" id="thanksLabel">Sistema bloccato!</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    Ma ti è andata male, riprova un po' dai. Ricordati che il cognome deve cominciare con la maiuscola, come ti insegnavano alle elementari.
+                    Chiama Olli che te lo sblocca
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Riprova belin</button>
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Bene</button>
                 </div>
             </div>
         </div>
     </div>	
+	
+    <!-- Modal forbidden -->
+    <div class="modal fade" id="forbidden" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="thanksLabel">Ahia!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Hai sbagliato a scrivere qualcosa, almeno spero
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Riprova</button>
+                </div>
+            </div>
+        </div>
+    </div>		
+	
+    <!-- Modal tooMany -->
+    <div class="modal fade" id="tooMany" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="thanksLabel">Malissimo!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Le credenziali sono state sbagliate troppe volte, devi aspettare un po' di tempo prima di riprovare
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Aspetterò</button>
+                </div>
+            </div>
+        </div>
+    </div>	
+	
+    <!-- Modal generic -->
+    <div class="modal fade" id="default" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="thanksLabel">Boh?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Qualcosa è andato storto ma non saprei cosa
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Vabbuò</button>
+                </div>
+            </div>
+        </div>
+    </div>		
+
 
 	<div id="loader"></div>
 
@@ -121,7 +183,20 @@
 					},
 					error: function (result) {						
 						$('#loader').hide();
-						$('#close').modal();						
+						switch (result.status) {
+							case 423:
+								$('#locked').modal();
+								break;
+							case 403:
+								$('#forbidden').modal();
+								break;
+							case 429:
+								$('#tooMany').modal();
+								break;
+							default:
+								$('#default').modal();
+								break;
+						}							
 					}
                 });
                 //alert("Sent");                

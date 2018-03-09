@@ -25,24 +25,32 @@
             <!-- Welcome card -->
             <div class="card text-center">
                 <div class="card-body bg-transparent">
-                    <h4 class="card-title">Apriti Sesamo!</h4>
-                    <p class="card-text">Mica ti aspettavi che cliccavi su qualcosa ed era fatta?</p>
-                    <a href="http://vabbuo.it" class="mt-2 btn btn-success" data-toggle="tooltip" data-placement="left" title="Vabbuò dai guardati ancora due frasi">vabbuo.it</a>
-                    <a href="http://olimexsmart.it" class="mt-2 btn btn-danger" data-toggle="tooltip" data-placement="bottom" title="Scopri tutta la storia, in inglese">olimexsmart.it</a>
+                    <h4 class="card-title">Amministrazione</h4>
+                    <p class="card-text">Se sei qui per fare dei casini buona fortuna</p>
+					<a href="/index.htm" class="mt-2 btn btn-info" data-toggle="tooltip" data-placement="bottom" title="Magari funziona">Pagina Login</a>
                 </div>
             </div>
 
             <br>
 			
-			<!-- Radio buttons -->
+			<!-- Radio buttons first row-->
 			<fieldset class="form-group">
 				<div class="row">
-					<legend class="col-form-legend col-sm-2"><b>Azione</b></legend>
+					<legend class="col-form-legend col-sm-2"><b>Sistema</b></legend>
 					<div class="btn-group col-sm-10" data-toggle="buttons">
 						<label class="btn btn-secondary">
 							<input type="radio" name="action" id="radio1" value="lock" autocomplete="off">Blocca</label>
 						<label class="btn btn-secondary">
 							<input type="radio" name="action" id="radio1bis" value="revokeAll" autocomplete="off">Rimuovi Tutti</label>
+					</div>
+				</div>
+			</fieldset>
+			
+			<!-- Radio buttons second row-->
+			<fieldset class="form-group">
+				<div class="row">
+					<legend class="col-form-legend col-sm-2"><b>Utente</b></legend>
+					<div class="btn-group col-sm-10" data-toggle="buttons">								
 						<label class="btn btn-secondary">						
 							<input type="radio" name="action" id="radio2" value="revoke" autocomplete="off">Rimuovi</label>
 						<label class="btn btn-secondary active">
@@ -51,7 +59,7 @@
 							<input type="radio" name="action" id="radio4" value="check" autocomplete="off">Prova</label>
 					</div>
 				</div>
-			</fieldset>
+			</fieldset>			
 
             <form id="newsentence" method="post">
                 <!-- Text inputs -->
