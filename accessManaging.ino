@@ -5,13 +5,16 @@
 */
 bool checkValidity(File &codes, bool admin, char * credentials, bool revoke) {
     //File codes;
-	//Serial.println(FreeRam());
+    //Serial.println(FreeRam());
+    if (credentials == NULL) // Avoid making a mess
+    	return false;
+    	
     if (!admin) {
         // Open file with name-key pairs
         codes = SD.open("/access.nop");
-        if (!codes) 
+        if (!codes)
             return false;
-        
+
     } else {
         // Open file with name-key pairs
         codes = SD.open("/admin.nop");
@@ -19,33 +22,42 @@ bool checkValidity(File &codes, bool admin, char * credentials, bool revoke) {
             return false;
     }
 
-	byte len = strlen(credentials);
-	len++;
+    byte len = strlen(credentials);
+    len++; // Room for string terminator
     char * entry = (char *) malloc(len);
-    byte index = 0;
+    if (!entry)	// Allocation error
+    	return false;
+    byte index;
     char c;
+    bool neverMind = false;
     while (codes.available()) {
+    	index = 0;
         // Get one line at the time from file
-        while ((c = codes.read()) != '\n') { // Once line at a time
+        while ((c = codes.read()) != '\n') { // Once line at a time            
             entry[index] = c;
             index++;
-            if (index == len) { // Keep index in bounds
-            	free(entry);
-                codes.close();
-                return false;
+            if (index == len) { // Don't overflow
+            	while ((c = codes.read()) != '\n'); // Reach the end of the line anyway
+            	neverMind = true;
+            	break;
             }
             entry[index] = '\0';
-        }       
-/*        Serial.println(entry);
+        }
+        // Don't ever bother confronting if the entry is longer than the credentials
+        if (neverMind) {
+        	neverMind = false;
+        	continue;
+        }
+ /*       Serial.println(entry);
         for (byte i = 0; i < strlen(entry); i++) {
-        	Serial.print((byte) entry[i]);
-        	Serial.print(" ");
+            Serial.print((byte) entry[i]);
+            Serial.print(" ");
         }
         Serial.println();
         for (byte i = 0; i < strlen(credentials); i++) {
-        	Serial.print((byte) credentials[i]);
-        	Serial.print(" ");
-        }        
+            Serial.print((byte) credentials[i]);
+            Serial.print(" ");
+        }
         Serial.println(); */
         if (strcmp(credentials, entry) == 0) {
             if (revoke) {
@@ -53,19 +65,20 @@ bool checkValidity(File &codes, bool admin, char * credentials, bool revoke) {
                 unsigned long pos = codes.position();
                 codes.close(); // Close in read mode
                 codes = SD.open("/access.nop", FILE_WRITE);
-                codes.seek(pos - 4); // 3 chars before \n
+                if (!codes) 
+                	return false;
+                codes.seek(pos - 5); // 3 chars before \n
                 codes.println("###"); // Invalidating line, the \n is overwritten
             }
             free(entry);
             codes.close();
             return true; // Only successful exit point
-        }
-        index = 0;
+        }        
     }
 
-   	free(entry);
-    // Entry not found    
-    codes.close();    
+    free(entry);
+    // Entry not found
+    codes.close();
     return false;
 }
 
@@ -102,18 +115,20 @@ void logRequest(File &logf, HTTPparser::MethodType method, char * path, char * m
         return;
 
     logf.write(path, strlen(path));
-    logf.write('\t');
-    logf.write(message, strlen(message));
+    if (method == HTTPparser::POST) {
+        logf.write('\t');
+        logf.write(message, strlen(message));
+    }
     logf.println();
 
     logf.close();
 }
 
 void openDoor() {
-	digitalWrite(ledOpen, HIGH);
-	digitalWrite(opening, LOW);
-	delay(1500);
-	digitalWrite(ledOpen, LOW);
-	digitalWrite(opening, HIGH);
+    digitalWrite(ledOpen, HIGH);
+    digitalWrite(opening, LOW);
+    delay(1500);
+    digitalWrite(ledOpen, LOW);
+    digitalWrite(opening, HIGH);
 }
 

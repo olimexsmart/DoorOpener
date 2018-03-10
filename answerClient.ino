@@ -10,7 +10,7 @@ void answerClient() {
             logRequest(webFile, HTTPparser::GET, Parser.Path, NULL);
             // Web clients make this assumption
             if (strcmp(Parser.Path, "/") == 0)
-                strcpy(Parser.Path, "index.htm");
+                strcpy(Parser.Path, "/index.htm");
             // Check if we have the file
             if (SD.exists(Parser.Path)) {
                 webFile = SD.open(Parser.Path);   // open web page file
@@ -37,8 +37,8 @@ void answerClient() {
                     }
                 }
             } else {	// 404 landing page
-                strcpy(Parser.Path, "404.htm");
-                webFile = SD.open("404.htm");
+                strcpy(Parser.Path, "/404.htm");
+                webFile = SD.open("/404.htm");
                 sendHeaders(404, client, "text/html");
             }
             // Send the actual file
@@ -91,15 +91,15 @@ void answerClient() {
                     char * user = strstr(Parser.Message, "&n=");
                     user++; // We don't want the & amperstand
                     byte offset = user - Parser.Message; // Offset of where the user part starts
-                    char * admin = (char * ) malloc(offset + 1);                    
+                    char * admin = (char * ) malloc(offset + 1); // If allocation fails the situation is managed
                     strncpy(admin, Parser.Message, offset - 1);
                     admin[offset] = '\0';
-                    Serial.println(admin); 
+                    //Serial.println(admin); 
                     if (checkValidity(webFile, true, admin, false) && !tooManyAttempts) {
                         if (addUser(webFile, user))
                             statusCode = 200;
                         else
-                            statusCode = 500;
+                            statusCode = 500;	// Error in allocation or in file manipulation
                     } else
                         statusCode = tooManyAttempts ? 429 : 403;
 
@@ -113,7 +113,8 @@ void answerClient() {
                         statusCode = tooManyAttempts ? 429 : 403;
                 }
 
-
+				if (statusCode == 403) // Wrong password 
+					attempts++;
                 // Send the HTTP response headers
                 sendHeaders(statusCode, client, NULL);
             }
