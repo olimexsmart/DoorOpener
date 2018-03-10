@@ -41,7 +41,7 @@ void setup()
 
     Ethernet.begin(mac, ip);  // initialize Ethernet device
     server.begin();           // start to listen for clients
-    Serial.begin(9600);       // for debugging
+    Serial.begin(115200);       // for debugging
 
     // initialize SD card
     Serial.println(F("Initializing SD card..."));

@@ -29,10 +29,10 @@ void answerClient() {
                         sendHeaders(200, client, "text/javascript");
                     } else if (strcmp(format, "ico") == 0) {
                         sendHeaders(200, client, "image/x-icon");
-                    } /*else if (strcmp(format, "nop") == 0) {
+                    } else if (strcmp(format, "nop") == 0) {
                         sendHeaders(403, client, NULL);
                         break; // Break from GET
-                    } */else {
+                    } else {
                         sendHeaders(200, client, "text/plain");
                     }
                 }
