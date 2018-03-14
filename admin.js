@@ -1,6 +1,8 @@
 res = [];
 $(function () {
-	$('[data-toggle="tooltip"]').tooltip();
+	if (!/Mobi/.test(navigator.userAgent)) {
+		$('[data-toggle="tooltip"]').tooltip();
+	}
 	$('#radio3')[0].checked = true;
 	res = "add.ard";
 	// Modifing the visibility of the UI
