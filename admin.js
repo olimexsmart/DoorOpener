@@ -46,12 +46,16 @@ $(function () {
 	
 	//handle = null;
 	$('#submit').click(function () {
-		$.ajax({
+		// Trin trailing whitespaces
+		$('#nome').val($.trim($('#nome').val()));
+		$('#usernome').val($.trim($('#usernome').val()));
+
+		$.ajax({	// Send request
 			url: res,
 			method: "POST",
 			dataType: "text",
-			data: $('#newsentence').find('input:visible').serialize(),
-			timeout: 3000,
+			data: $('#access').find('input:visible').serialize(),
+			timeout: 10000,
 			success: function (result) {				
 				$('#loader').hide();
 				$('#completed').modal();						

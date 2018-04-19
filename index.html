@@ -35,7 +35,7 @@
 
             <br>
 
-            <form id="newsentence" method="post">
+            <form id="access" method="post">
                 <!-- Text inputs -->
                 <div class="form-group row">
                     <label for="n" class="col-sm-2 col-form-label">
@@ -112,7 +112,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    Probabilmente che hai messo l'iniziale minuscola del cognome (pirla con bassa autostima) oppure il completamento automatico del cellulare ti ha aggiunto uno spazio in fondo!
+                    Probabilmente che hai messo l'iniziale minuscola del cognome (Un po' di autostima dai)
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Riprova</button>
@@ -164,48 +164,7 @@
 
 	<div id="loader"></div>
 
-    <script>
-        $(function () {
-            if (!/Mobi/.test(navigator.userAgent)) {
-                $('[data-toggle="tooltip"]').tooltip();
-            }
-			
-			
-			//handle = null;
-            $('#submit').click(function () {
-                $.ajax({
-                    url: "login.ard",
-                    method: "POST",
-                    dataType: "text",
-                    data: $('#newsentence').serialize(),
-					timeout: 3000,
-					success: function (result) {						
-						$('#loader').hide();
-						$('#open').modal();						
-					},
-					error: function (result) {						
-						$('#loader').hide();
-						switch (result.status) {
-							case 423:
-								$('#locked').modal();
-								break;
-							case 403:
-								$('#forbidden').modal();
-								break;
-							case 429:
-								$('#tooMany').modal();
-								break;
-							default:
-								$('#default').modal();
-								break;
-						}							
-					}
-                });
-                //alert("Sent");                
-				$('#loader').show();
-            });
-        })
-    </script>
+	<script src="index.js"></script>
 </body>
 
 </html>
