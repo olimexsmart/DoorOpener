@@ -2,6 +2,9 @@
     This function takes no arguments because it' just for code readability.
     This code would be too long to be directly written in the main loop.
 */
+
+#define BUFF_SIZE 256
+
 void answerClient() {
 
     switch (Parser.Method) {
@@ -42,8 +45,12 @@ void answerClient() {
                 sendHeaders(404, client, "text/html");
             }
             // Send the actual file
-            while (webFile.available()) {
-                client.write(webFile.read()); // send web page to client
+            {   // Again scoping to not interfiere with with switch scoping
+                char * buff = (char *) malloc(BUFF_SIZE);
+                while (webFile.available()) {
+                    client.write(buff, webFile.read(buff, BUFF_SIZE)); // send web page to client
+                }
+                free(buff);
             }
             webFile.close();
             break;	// Break from GET
