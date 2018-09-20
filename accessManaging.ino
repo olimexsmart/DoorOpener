@@ -124,11 +124,9 @@ void logRequest(File &logf, HTTPparser::MethodType method, char * path, char * m
     logf.close();
 }
 
-void openDoor() {
-    digitalWrite(ledOpen, HIGH);
+void openDoor() {    
     digitalWrite(opening, LOW);
-    delay(1500);
-    digitalWrite(ledOpen, LOW);
+    delay(1500);    
     digitalWrite(opening, HIGH);
 }
 

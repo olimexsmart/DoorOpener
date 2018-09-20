@@ -1,6 +1,5 @@
 /*
     Server Door Opener
-
 */
 
 #include <SPI.h>
@@ -9,14 +8,19 @@
 #include "HTTPparser.h"
 
 
-#define chipSelect 4
-#define ledClient 2
-#define ledOpen 3
-#define opening 5
+#define chipSelectSD 9
+#define chipSelectEth 10
+#define resetEth 6
+#define opening 7
+#define watchDog 6
 
-// MAC address from Ethernet shield sticker under board
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress ip(192, 168, 1, 33); // IP address, may need to change depending on network
+
+// MAC address randomly generated
+//byte mac[] = { 0x02, 0x42, 0xB5, 0x44, 0x17, 0x98 };
+byte mac[] = {
+    0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+};
+IPAddress ip(192, 168, 1, 34); // IP address, may need to change depending on network
 EthernetServer server(80);  // create a server at port 80
 EthernetClient client;
 HTTPparser Parser(15, 60);
@@ -32,20 +36,33 @@ byte attempts = 0;
 bool open = false;
 void setup()
 {
-    pinMode(ledClient, OUTPUT);
-    pinMode(ledOpen, OUTPUT);
+    Ethernet.init(chipSelectEth);
+    pinMode(resetEth, OUTPUT);
+    pinMode(watchDog, OUTPUT);
     pinMode(opening, OUTPUT);
-    digitalWrite(ledClient, LOW);
-    digitalWrite(ledOpen, LOW);
     digitalWrite(opening, HIGH);
+    pinMode(chipSelectSD, OUTPUT); // Avoid conflict on SPI MISO
+    digitalWrite(chipSelectSD, HIGH);
+    digitalWrite(resetEth, LOW);
+    delay(100);
+    digitalWrite(resetEth, HIGH);
+    delay(100);
 
-    Ethernet.begin(mac, ip);  // initialize Ethernet device
-    server.begin();           // start to listen for clients
     Serial.begin(115200);       // for debugging
 
-    // initialize SD card
+    // Ethernet initialization
+    Ethernet.begin(mac, ip);  // initialize Ethernet device
+    server.begin();           // start to listen for clients
+    if (Ethernet.hardwareStatus() == EthernetW5500) {
+        Serial.print(F("SUCCESS - W5500 Ethernet controller detected. Server is at: "));
+        Serial.println(Ethernet.localIP());
+    } else {
+        Serial.println(F("ERROR - W5500 not correctly detected"));
+    }
+
+    // SD card Initialization
     Serial.println(F("Initializing SD card..."));
-    if (!SD.begin(chipSelect)) {
+    if (!SD.begin(chipSelectSD)) {
         Serial.println(F("ERROR - SD card initialization failed!"));
         return;    // init failed
     }
@@ -55,13 +72,16 @@ void setup()
         Serial.println(F("ERROR - Can't find index.htm file!"));
         return;  // can't find index file
     }
-    Serial.println(F("SUCCESS - Found index.htm file."));
+    Serial.println(F("SUCCESS - Found index.htm file.\nDoor Opener READY"));
 
     t = millis();
 }
 
 void loop()
 {
+    // Reset watchdog
+    signalDog();
+
     // Door opening
     if (open) {
         openDoor();
@@ -84,7 +104,6 @@ void loop()
     client = server.available();  // try to get client
 
     if (client) {  // Got client?
-        digitalWrite(ledClient, HIGH);
 
         // Collecting data from client
         while (client.connected()) {
@@ -115,9 +134,12 @@ void loop()
         delay(1);      // give the web browser time to receive the data
         client.stop(); // close the connection
         Parser.Reset(); // Prepare parser for new request
-        digitalWrite(ledClient, LOW);
     }
 }
 
 
-
+void signalDog() {
+    digitalWrite(watchDog, HIGH);
+    delay(10);
+    digitalWrite(watchDog, LOW);
+}
