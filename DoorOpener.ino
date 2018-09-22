@@ -12,14 +12,12 @@
 #define chipSelectEth 10
 #define resetEth 6
 #define opening 7
-#define watchDog 6
+#define watchDog 8
 
 
 // MAC address randomly generated
-//byte mac[] = { 0x02, 0x42, 0xB5, 0x44, 0x17, 0x98 };
-byte mac[] = {
-    0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
-};
+byte mac[] = { 0x02, 0x42, 0xB5, 0x44, 0x17, 0x98 };
+
 IPAddress ip(192, 168, 1, 34); // IP address, may need to change depending on network
 EthernetServer server(80);  // create a server at port 80
 EthernetClient client;

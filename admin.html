@@ -15,7 +15,7 @@
         crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="olliout.css">
-	<link rel="stylesheet" href="loader.css">
+    <link rel="stylesheet" href="loader.css">
 </head>
 
 <body style="background-color: CORAL;">
@@ -27,71 +27,58 @@
                 <div class="card-body bg-transparent">
                     <h4 class="card-title">Amministrazione</h4>
                     <p class="card-text">Se sei qui per fare dei casini buona fortuna</p>
-					<a href="/index.htm" class="mt-2 btn btn-info" data-toggle="tooltip" data-placement="bottom" title="Magari funziona">Pagina Login</a>
+                    <a href="/index.htm" class="mt-2 btn btn-info" data-toggle="tooltip" data-placement="bottom" title="Magari funziona">Pagina
+                        Login</a>
                 </div>
             </div>
 
             <br>
-			
-			<!-- Radio buttons first row-->
-			<fieldset class="form-group">
-				<div class="row">
-					<legend class="col-form-legend col-sm-2"><b>Sistema</b></legend>
-					<div class="btn-group col-sm-10" data-toggle="buttons">
-						<label class="btn btn-secondary">
-							<input type="radio" name="action" id="radio1" value="lock" autocomplete="off">Blocca</label>
-						<label class="btn btn-secondary">
-							<input type="radio" name="action" id="radio1bis" value="revokeAll" autocomplete="off">Svuota</label>						
-						<label class="btn btn-secondary">						
-							<input type="radio" name="action" id="radio2" value="revoke" autocomplete="off">Revoca</label>
-						<label class="btn btn-secondary active">
-							<input type="radio" name="action" id="radio3" value="add" autocomplete="off">Nuovo</label>
-						<label class="btn btn-secondary">
-							<input type="radio" name="action" id="radio4" value="check" autocomplete="off">Test</label>
-					</div>
-				</div>
-			</fieldset>			
+
+            <!-- Radio buttons first row-->
+            <fieldset class="form-group">
+                <div class="row">
+                    <legend class="col-form-legend col-sm-2"><b>Sistema</b></legend>
+                    <div class="btn-group col-sm-10" data-toggle="buttons">
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="action" id="radio1" value="lock" autocomplete="off">Blocca</label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="action" id="radio1bis" value="revokeAll" autocomplete="off">Svuota</label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="action" id="radio2" value="revoke" autocomplete="off">Revoca</label>
+                        <label class="btn btn-secondary active">
+                            <input type="radio" name="action" id="radio3" value="add" autocomplete="off">Nuovo</label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="action" id="radio4" value="check" autocomplete="off">Test</label>
+                    </div>
+                </div>
+            </fieldset>
 
             <form id="access" method="post">
                 <!-- Text inputs -->
                 <div class="form-group row">
-					<!-- Administrator inputs -->
-                    <label for="nome" class="col-sm-2 col-form-label adminname" id="">
-                        <b>Admin</b>
-                    </label>
-                    <div class="col-sm-10 adminname">
-                        <input type="text" class="form-control" name="an" id="nome" placeholder="Nome Admin" data-toggle="tooltip" data-placement="top"
-                            title="Lettera iniziale Maiuscola">
-                    </div>
+                    <!-- Administrator inputs -->
                     <label for="key" class="mt-2 col-sm-2 col-form-label adminpassword">
-                        <b>Password</b>
+                        <b>Master Password</b>
                     </label>
                     <div class="mt-2 col-sm-10 adminpassword">
-                        <input type="password" class="form-control" name="ak" id="key" placeholder="Chiave Admin" data-toggle="tooltip" data-placement="top"
-                            title="Mi raccomando">
+                        <input type="password" class="form-control" name="ak" id="key" placeholder="Chiave Admin"
+                            data-toggle="tooltip" data-placement="top" title="Mi raccomando">
                     </div>
-					
-					<!-- User inputs -->
-                    <label for="usernome" class="mt-2 col-sm-2 col-form-label username">
-                        <b>User</b>
-                    </label>
-                    <div class="mt-2 col-sm-10 username">
-                        <input type="text" class="form-control" name="n" id="usernome" placeholder="Nome Utente" data-toggle="tooltip" data-placement="top"
-                            title="Lettera iniziale Maiuscola">
-                    </div>
+
+                    <!-- User inputs -->
                     <label for="userkey" class="mt-2 col-sm-2 col-form-label userpassword">
                         <b>Password</b>
                     </label>
                     <div class="mt-2 col-sm-10 userpassword">
-                        <input type="password" class="form-control" name="k" id="userkey" placeholder="Chiave Utente" data-toggle="tooltip" data-placement="top"
-                            title="Mi raccomando">
-                    </div>					
-					
-					
-					<!-- Confirm button -->
+                        <input type="password" class="form-control" name="k" id="userkey" placeholder="Chiave Utente"
+                            data-toggle="tooltip" data-placement="top" title="Mi raccomando">
+                    </div>
+
+
+                    <!-- Confirm button -->
                     <div class="mt-2 col-sm-12 text-center">
-                        <button type="button" class="btn btn-success btn-lg btn-block" data-toggle="tooltip" data-placement="bottom" title="Daje"
-                            id="submit">Agisci</button>
+                        <button type="button" class="btn btn-success btn-lg btn-block" data-toggle="tooltip"
+                            data-placement="bottom" title="Daje" id="submit">Agisci</button>
                     </div>
                 </div>
             </form>
@@ -117,7 +104,7 @@
             </div>
         </div>
     </div>
-	
+
     <!-- Modal locked -->
     <div class="modal fade" id="locked" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -136,8 +123,8 @@
                 </div>
             </div>
         </div>
-    </div>	
-	
+    </div>
+
     <!-- Modal forbidden -->
     <div class="modal fade" id="forbidden" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -156,8 +143,8 @@
                 </div>
             </div>
         </div>
-    </div>		
-	
+    </div>
+
     <!-- Modal tooMany -->
     <div class="modal fade" id="tooMany" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -176,7 +163,7 @@
                 </div>
             </div>
         </div>
-    </div>	
+    </div>
 
     <!-- Modal generic -->
     <div class="modal fade" id="default" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
@@ -196,9 +183,9 @@
                 </div>
             </div>
         </div>
-    </div>			
+    </div>
 
-	<div id="loader"></div>
+    <div id="loader"></div>
 
     <script src="admin.js"></script>
 </body>

@@ -95,7 +95,7 @@ void answerClient() {
                     // Add a user
                 } else if (strcmp(Parser.Path, "/add.ard") == 0) {
                     // Split the string between administrator and user part
-                    char * user = strstr(Parser.Message, "&n=");
+                    char * user = strstr(Parser.Message, "&k=");
                     user++; // We don't want the & amperstand
                     byte offset = user - Parser.Message; // Offset of where the user part starts
                     char * admin = (char * ) malloc(offset + 1); // If allocation fails the situation is managed
