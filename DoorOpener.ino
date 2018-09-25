@@ -1,7 +1,14 @@
 /*
     Server Door Opener
-*/
 
+    TODO:
+    - Remove dynamic allocation
+    - Optimize RAM usage as possible, find at least 141 bytes
+    - Create Log page using time information
+    - Try to use data from the RTC instead of internal millis()
+    
+*/
+//#include <Wire.h>
 #include <SPI.h>
 #include <Ethernet.h>
 #include <SD.h>
@@ -15,11 +22,11 @@
 #define watchDog 8
 
 
-// MAC address randomly generated
+// MAC address
 byte mac[] = { 0x02, 0x42, 0xB5, 0x44, 0x17, 0x98 };
 
-IPAddress ip(192, 168, 1, 34); // IP address, may need to change depending on network
-EthernetServer server(80);  // create a server at port 80
+IPAddress ip(192, 168, 1, 34); // IP address
+EthernetServer server(80);  // Create a server at port 80
 EthernetClient client;
 HTTPparser Parser(15, 60);
 
@@ -30,7 +37,8 @@ bool locked = false;
 unsigned long t;
 byte attempts = 0;
 
-// Open door flag, the opening is blocking (very simple), needs to be done after the client
+// Open door flag, the opening is blocking (very simple)
+// needs to be done after the client has been served
 bool open = false;
 void setup()
 {

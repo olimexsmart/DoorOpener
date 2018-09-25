@@ -46,10 +46,6 @@ $(function () {
 	
 	//handle = null;
 	$('#submit').click(function () {
-		// Trin trailing whitespaces
-		$('#nome').val($.trim($('#nome').val()));
-		$('#usernome').val($.trim($('#usernome').val()));
-
 		$.ajax({	// Send request
 			url: res,
 			method: "POST",

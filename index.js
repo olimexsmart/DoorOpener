@@ -3,10 +3,7 @@ $(function () {
         $('[data-toggle="tooltip"]').tooltip();
     }
 
-    $('#submit').click(function () {
-    		// Trin trailing whitespaces
-    		$('#nome').val($.trim($('#nome').val()));
-        
+    $('#submit').click(function () {    
         $.ajax({	// Send request
             url: "login.ard",
             method: "POST",
