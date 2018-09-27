@@ -8,18 +8,24 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define PATH_ALLOCATION 15
+#define MSG_ALLOCATION 30
+
 class HTTPparser {
 
     public:
-        HTTPparser(unsigned int pathAllocation, unsigned int messageAllocation);
+        //HTTPparser(unsigned int pathAllocation, unsigned int messageAllocation);
+        HTTPparser();
         ~HTTPparser();
         void ParseChar(char c);
         void Reset();
         bool IsValid();
         void AllSheWrote();
         const char * MethodString();
-        char * Path;
-        char * Message;
+        //char * Path;
+        //char * Message;
+        char Path[PATH_ALLOCATION];
+        char Message[MSG_ALLOCATION];
 
         typedef enum {
             GET,
@@ -29,7 +35,7 @@ class HTTPparser {
         MethodType Method;
 
     private:
-        HTTPparser();
+        //HTTPparser();
         char method[6];
         unsigned int index;
         unsigned int pathAllocation;

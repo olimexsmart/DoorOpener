@@ -6,15 +6,18 @@
     - Optimize RAM usage as possible, find at least 141 bytes
     - Create Log page using time information
     - Try to use data from the RTC instead of internal millis()
-    
+
 */
-//#include <Wire.h>
+#include <Wire.h>
 #include <SPI.h>
 #include <Ethernet.h>
-#include <SD.h>
+//#include <SD.h>
+#include <SdFat.h>
+#include "FreeStack.h"
 #include "HTTPparser.h"
 
 
+#define BUFF_SIZE 100
 #define chipSelectSD 9
 #define chipSelectEth 10
 #define resetEth 6
@@ -28,9 +31,10 @@ byte mac[] = { 0x02, 0x42, 0xB5, 0x44, 0x17, 0x98 };
 IPAddress ip(192, 168, 1, 34); // IP address
 EthernetServer server(80);  // Create a server at port 80
 EthernetClient client;
-HTTPparser Parser(15, 60);
+HTTPparser Parser;
+SdFat SD;
 
-File webFile;
+File file;
 // Too any attempts variables
 bool tooManyAttempts = false;
 bool locked = false;
@@ -40,6 +44,9 @@ byte attempts = 0;
 // Open door flag, the opening is blocking (very simple)
 // needs to be done after the client has been served
 bool open = false;
+
+char global[BUFF_SIZE];
+
 void setup()
 {
     Ethernet.init(chipSelectEth);
@@ -81,6 +88,9 @@ void setup()
     Serial.println(F("SUCCESS - Found index.htm file.\nDoor Opener READY"));
 
     t = millis();
+
+	Serial.print(F("Available RAM at end of setup: "));
+    Serial.println(FreeStack());
 }
 
 void loop()
@@ -134,7 +144,7 @@ void loop()
         } else {
             Serial.println(F("We have an error"));
             // Error 500
-            sendHeaders(500, client, NULL);
+            sendHeaders(500, NULL);
         }
 
         delay(1);      // give the web browser time to receive the data
