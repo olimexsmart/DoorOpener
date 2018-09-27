@@ -15,9 +15,11 @@
 #include <SdFat.h>
 #include "FreeStack.h"
 #include "HTTPparser.h"
+#include <time.h>
 
 
 #define BUFF_SIZE 100
+#define DS1307_ADDRESS 0x68
 #define chipSelectSD 9
 #define chipSelectEth 10
 #define resetEth 6
@@ -62,8 +64,8 @@ void setup()
     delay(100);
 
     Serial.begin(115200);       // for debugging
+    Wire.begin();	// DS1307 RTC
 
-    // Ethernet initialization
     Ethernet.begin(mac, ip);  // initialize Ethernet device
     server.begin();           // start to listen for clients
     if (Ethernet.hardwareStatus() == EthernetW5500) {
@@ -89,8 +91,10 @@ void setup()
 
     t = millis();
 
-	Serial.print(F("Available RAM at end of setup: "));
+    Serial.print(F("Available RAM at end of setup: "));
     Serial.println(FreeStack());
+    Serial.println(now());
+    //Serial.println(now());
 }
 
 void loop()
@@ -120,7 +124,8 @@ void loop()
     client = server.available();  // try to get client
 
     if (client) {  // Got client?
-
+		//Serial.println(now());
+		
         // Collecting data from client
         while (client.connected()) {
             if (client.available()) {   // client data available to read
@@ -159,3 +164,31 @@ void signalDog() {
     delay(10);
     digitalWrite(watchDog, LOW);
 }
+
+
+unsigned long now() {
+    struct tm t;
+
+    // Reset the register pointer
+    Wire.beginTransmission(DS1307_ADDRESS);
+    Wire.write(0x00);
+    Wire.endTransmission();
+    Wire.requestFrom(DS1307_ADDRESS, 7);
+
+	// Filling up tm structure, wday is ignored but is still needed to read it to advance register pointer
+    t.tm_sec = bcdToDec(Wire.read());
+	t.tm_min = bcdToDec(Wire.read());
+	t.tm_hour = bcdToDec(Wire.read() & 0b111111); //24 hour time
+	t.tm_wday = bcdToDec(Wire.read()) - 1;
+	t.tm_mday = bcdToDec(Wire.read());
+	t.tm_mon = bcdToDec(Wire.read()) - 1;
+	t.tm_year = bcdToDec(Wire.read()) + 130;
+	
+	return (unsigned long) mktime(&t);
+}
+
+byte bcdToDec(byte val)  {
+    // Convert binary coded decimal to normal decimal numbers
+    return ( (val / 16 * 10) + (val % 16) );
+}
+
