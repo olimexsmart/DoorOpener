@@ -3,54 +3,49 @@ $(function () {
 	if (!/Mobi/.test(navigator.userAgent)) {
 		$('[data-toggle="tooltip"]').tooltip();
 	}
-	$('#radio3')[0].checked = true;
+	// Without these two lines any options has the property checked to true
+	$('#r3')[0].checked = true;
+	$('#v1')[0].checked = true;
 	res = "add.ard";
 	// Modifing the visibility of the UI
 	// elements depending on the desired action
-	$('#radio1').on('change', function () {
-		$('.adminname').show();
-		$('.adminpassword').show();
-		$('.username').hide();
+	$('#r1').on('change', function () {
+		$('.adminpassword').show(); 
 		$('.userpassword').hide();
+		$('#timeval').hide();
 		res = "lock.ard";
 	});
-	$('#radio1bis').on('change', function () {
-		$('.adminname').show();
+	$('#r2').on('change', function () {
 		$('.adminpassword').show();
-		$('.username').hide();
 		$('.userpassword').hide();
+		$('#timeval').hide();
 		res = "revokeAll.ard";
 	});			
-	$('#radio2').on('change', function () {
-		$('.adminname').hide();
-		$('.adminpassword').hide();
-		$('.username').show();
-		$('.userpassword').show();
-		res = "revoke.ard"
-	});
-	$('#radio3').on('change', function () {
-		$('.adminname').show();
+	$('#r3').on('change', function () {
 		$('.adminpassword').show();
-		$('.username').show();
 		$('.userpassword').show();
+		$('#timeval').show();
 		res = "add.ard";
 	});
-	$('#radio4').on('change', function () {
-		$('.adminname').hide();
+	$('#r4').on('change', function () {
 		$('.adminpassword').hide();
-		$('.username').show();
 		$('.userpassword').show();
+		$('#timeval').hide();
 		res = "check.ard";
 	});
 	
 	
 	//handle = null;
 	$('#submit').click(function () {
+		d = $('#access').find('input:visible').serialize();
+		if($('#r3')[0].checked)		
+			d += '@' + (Math.floor(Date.now() / 1000) + parseInt($("input[name=v]:checked").val()));
+
 		$.ajax({	// Send request
 			url: res,
 			method: "POST",
 			dataType: "text",
-			data: $('#access').find('input:visible').serialize(),
+			data: d,
 			timeout: 10000,
 			success: function (result) {				
 				$('#loader').hide();

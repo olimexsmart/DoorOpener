@@ -34,19 +34,36 @@
 
             <br>
 
-            <!-- Radio buttons first row-->
+            <!-- Action selection-->
             <fieldset class="form-group">
                 <div class="row">
                     <legend class="col-form-legend col-sm-2"><b>Sistema</b></legend>
                     <div class="btn-group col-sm-10" data-toggle="buttons">
                         <label class="btn btn-secondary">
-                            <input type="radio" name="action" id="radio1" value="lock" autocomplete="off">Blocca</label>
+                            <input type="radio" name="a" id="r1" autocomplete="off">Blocca</label>
                         <label class="btn btn-secondary">
-                            <input type="radio" name="action" id="radio1bis" value="revokeAll" autocomplete="off">Svuota</label>
+                            <input type="radio" name="a" id="r2" autocomplete="off">Svuota</label>
                         <label class="btn btn-secondary active">
-                            <input type="radio" name="action" id="radio3" value="add" autocomplete="off">Nuovo</label>
+                            <input type="radio" name="a" id="r3" autocomplete="off">Nuovo</label>
                         <label class="btn btn-secondary">
-                            <input type="radio" name="action" id="radio4" value="check" autocomplete="off">Test</label>
+                            <input type="radio" name="a" id="r4" autocomplete="off">Test</label>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Password time validity -->
+            <fieldset class="form-group" id="timeval">
+                <div class="row">
+                    <legend class="col-form-legend col-sm-2"><b>Validità</b></legend>
+                    <div class="btn-group col-sm-10" data-toggle="buttons">
+                        <label class="btn btn-secondary active">
+                            <input type="radio" name="v" id="v1" value="21600" autocomplete="off">6 Ore</label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="v" id="v2" value="259200" autocomplete="off">3 Giorni</label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="v" id="v3" value="2592000" autocomplete="off">30 Giorni</label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="v" id="v4" value="31536000" autocomplete="off">1 Anno</label>
                     </div>
                 </div>
             </fieldset>

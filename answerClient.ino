@@ -39,7 +39,7 @@ void answerClient() {
                 }
             } else {	// 404 landing page
                 strcpy(Parser.Path, "/404.htm");
-                file = SD.open("/404.htm");
+                file = SD.open(F("/404.htm"));
                 sendHeaders(404, "text/html");
             }
             // Send the actual file
@@ -57,7 +57,7 @@ void answerClient() {
 
                 // Login attempt
                 if (strcmp(Parser.Path, "/login.ard") == 0) {
-                    if (checkValidity(false, Parser.Message) && !tooManyAttempts && !locked) {
+                    if (checkValidity(Parser.Message) && !tooManyAttempts && !locked) {
                         // Open door here
                         open = true;
                         statusCode = 200;
@@ -66,7 +66,7 @@ void answerClient() {
 
                     // Lock access
                 } else if (strcmp(Parser.Path, "/lock.ard") == 0) {
-                    if (checkValidity(true, Parser.Message) && !tooManyAttempts) {
+                    if (checkValidityAdmin(Parser.Message) && !tooManyAttempts) {
                         locked = !locked; // Toggle the locked status
                         statusCode = locked ? 423 : 200;
                     } else
@@ -74,7 +74,7 @@ void answerClient() {
 
                     // Remove all users
                 } else if (strcmp(Parser.Path, "/revokeAll.ard") == 0) {
-                    if (checkValidity(true, Parser.Message) && !tooManyAttempts) {
+                    if (checkValidityAdmin(Parser.Message) && !tooManyAttempts) {
                         statusCode = 200;
                         SD.remove("/access.nop");	// Without the file is not possible to login
                     } else
@@ -88,7 +88,7 @@ void answerClient() {
                     byte offset = (user - Parser.Message) - 1; // Offset of where the user part starts       
                     strncpy(global, Parser.Message, offset);
                     global[offset] = '\0';
-                    if (checkValidity(true, global) && !tooManyAttempts) {
+                    if (checkValidityAdmin(global) && !tooManyAttempts) {
                         if (addUser(user))
                             statusCode = 200;
                         else
@@ -98,7 +98,7 @@ void answerClient() {
 
                     // Check the validity of user credentials
                 } else if (strcmp(Parser.Path, "/check.ard") == 0) {
-                    if (checkValidity(false, Parser.Message) && !tooManyAttempts) {
+                    if (checkValidity(Parser.Message) && !tooManyAttempts) {
                         statusCode = 200;
                     } else
                         statusCode = tooManyAttempts ? 429 : 403;

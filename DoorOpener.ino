@@ -18,7 +18,7 @@
 #include <time.h>
 
 
-#define BUFF_SIZE 100
+#define BUFF_SIZE 25
 #define DS1307_ADDRESS 0x68
 #define chipSelectSD 9
 #define chipSelectEth 10
@@ -30,7 +30,7 @@
 // MAC address
 byte mac[] = { 0x02, 0x42, 0xB5, 0x44, 0x17, 0x98 };
 
-IPAddress ip(192, 168, 1, 34); // IP address
+IPAddress ip(192, 168, 2, 34); // IP address
 EthernetServer server(80);  // Create a server at port 80
 EthernetClient client;
 HTTPparser Parser;
@@ -40,7 +40,7 @@ File file;
 // Too any attempts variables
 bool tooManyAttempts = false;
 bool locked = false;
-unsigned long t;
+unsigned long Tattempts, Tcheck;
 byte attempts = 0;
 
 // Open door flag, the opening is blocking (very simple)
@@ -63,7 +63,7 @@ void setup()
     digitalWrite(resetEth, HIGH);
     delay(100);
 
-    Serial.begin(115200);       // for debugging
+    Serial.begin(9600);       // for debugging
     Wire.begin();	// DS1307 RTC
 
     Ethernet.begin(mac, ip);  // initialize Ethernet device
@@ -89,7 +89,8 @@ void setup()
     }
     Serial.println(F("SUCCESS - Found index.htm file.\nDoor Opener READY"));
 
-    t = millis();
+    Tattempts = millis();
+    Tcheck = millis();
 
     Serial.print(F("Available RAM at end of setup: "));
     Serial.println(FreeStack());
@@ -101,6 +102,13 @@ void loop()
 {
     // Reset watchdog
     signalDog();
+
+    // Credentials checking
+    if (Tcheck + 5000 < millis()) {
+    	//checkCredentialsValidity(now());
+    	Tcheck = millis();
+    }
+    
 
     // Door opening
     if (open) {
@@ -114,9 +122,9 @@ void loop()
         If attempts is bigger than zero after 10 seconds decrease it a bit,
         only if we are not already over the max number of attempts
     */
-    if ((tooManyAttempts && millis() - t > 30000) || (attempts > 0 && !tooManyAttempts && millis() - t > 10000)) {
+    if ((tooManyAttempts && millis() - Tattempts > 30000) || (attempts > 0 && !tooManyAttempts && millis() - Tattempts > 10000)) {
         attempts--;
-        t = millis();
+        Tattempts = millis();
     }
 
 
