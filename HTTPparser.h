@@ -37,9 +37,9 @@ class HTTPparser {
     private:
         //HTTPparser();
         char method[6];
-        unsigned int index;
-        unsigned int pathAllocation;
-        unsigned int messageAllocation;
+        byte index;
+        byte pathAllocation;
+        byte messageAllocation;
 
         typedef enum {
             ERROR,
