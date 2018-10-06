@@ -4,18 +4,14 @@
 <head>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Portone</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
-        crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M"
-        crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb"
-        crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"
-        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="olliout.css">
-	<link rel="stylesheet" href="loader.css">
+    <link rel="stylesheet" href="loader.css">
 </head>
 
 <body style="background-color: greenyellow;">
@@ -27,9 +23,9 @@
                 <div class="card-body bg-transparent">
                     <h4 class="card-title">PortoNet</h4>
                     <p class="card-text">Inserisci la chiave di accesso</p>
-                    <a href="http://vabbuo.it" class="mt-2 btn btn-success" data-toggle="tooltip" data-placement="left" title="Vabbuò dai guardati ancora due frasi">vabbuo.it</a>
-                    <a href="http://olimexsmart.it" class="mt-2 btn btn-primary" data-toggle="tooltip" data-placement="bottom" title="Scopri tutta la storia, in inglese">olimexsmart.it</a>
-					<a href="/admin.htm" class="mt-2 btn btn-danger" data-toggle="tooltip" data-placement="bottom" title="Smanetta">Amministrazione</a>
+                    <a href="http://vabbuo.it" class="mt-2 btn btn-success" title="Vabbuò dai guardati ancora due frasi">vabbuo.it</a>
+                    <a href="http://olimexsmart.it" class="mt-2 btn btn-primary" title="Scopri tutta la storia, in inglese">olimexsmart.it</a>
+                    <a href="/admin.htm" class="mt-2 btn btn-danger" title="Smanetta">Amministrazione</a>
                 </div>
             </div>
 
@@ -42,12 +38,10 @@
                         <b>Password</b>
                     </label>
                     <div class="mt-2 col-sm-10">
-                        <input type="password" class="form-control" name="k" id="key" placeholder="Dai eh" data-toggle="tooltip" data-placement="top"
-                            title="Mi raccomando">
+                        <input type="password" class="form-control" name="k" id="key" placeholder="Dai eh" title="Mi raccomando">
                     </div>
                     <div class="mt-5 col-sm-12 text-center">
-                        <button type="button" class="btn btn-success btn-lg btn-block" data-toggle="tooltip" data-placement="bottom" title="Daje"
-                            id="submit">Fai un tentativo</button>
+                        <button type="button" class="btn btn-success btn-lg btn-block" title="Daje" id="submit">Fai un tentativo</button>
                     </div>
                 </div>
             </form>
@@ -68,12 +62,12 @@
                     Vieni su, a pra foco caro!
                 </div>
                 <div class="modal-footer">
-                    <a href="http://vabbuo.it" class="mt-2 btn btn-success" data-toggle="tooltip" data-placement="left" title="Vabbuò dai guardati ancora due frasi">Dai entra</a>
+                    <a href="http://vabbuo.it" class="mt-2 btn btn-success" title="Vabbuò dai guardati ancora due frasi">Dai entra</a>
                 </div>
             </div>
         </div>
     </div>
-	
+
     <!-- Modal locked -->
     <div class="modal fade" id="locked" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -92,8 +86,8 @@
                 </div>
             </div>
         </div>
-    </div>	
-	
+    </div>
+
     <!-- Modal forbidden -->
     <div class="modal fade" id="forbidden" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -112,8 +106,8 @@
                 </div>
             </div>
         </div>
-    </div>		
-	
+    </div>
+
     <!-- Modal tooMany -->
     <div class="modal fade" id="tooMany" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -132,8 +126,8 @@
                 </div>
             </div>
         </div>
-    </div>	
-	
+    </div>
+
     <!-- Modal generic -->
     <div class="modal fade" id="default" tabindex="-1" role="dialog" aria-labelledby="thanksLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -152,12 +146,12 @@
                 </div>
             </div>
         </div>
-    </div>		
+    </div>
 
 
-	<div id="loader"></div>
+    <div id="loader"></div>
 
-	<script src="index.js"></script>
+    <script src="index.js"></script>
 </body>
 
 </html>

@@ -5,11 +5,12 @@ bool checkValidity(char * credentials) {
         return false;
 
     // Open file with name-key pairs
-    Serial.println(F("u start"));
+    //Serial.println(F("u start"));
+    //Serial.println(FreeStack());
     file = SD.open(F("/access.nop"));
     if (!file)
         return false;
-
+	//Serial.println(FreeStack());
     byte index;
     char c;
     while (file.available()) {
@@ -19,7 +20,7 @@ bool checkValidity(char * credentials) {
             index++;
             global[index] = '\0';
         }
-		Serial.println(global);
+		//Serial.println(global);
         while ((c = file.read()) != '\n'); // Advance file pointer over timestamp
 
         if (strcmp(credentials, global) == 0) { // Check validity
@@ -28,7 +29,7 @@ bool checkValidity(char * credentials) {
         }
     }
 
-	Serial.println(F("u fail"));
+	//Serial.println(F("u fail"));
     // Entry not found
     file.close();
     return false;
@@ -39,11 +40,12 @@ bool checkValidityAdmin(char * credentials) {
         return false;
 
     // Open file with name-key pairs
-    Serial.println(F("v start"));
+    //Serial.println(F("v start"));
+    //Serial.println(FreeStack());
     file = SD.open(F("/admin.nop"));
     if (!file)
         return false;
-
+	//Serial.println(FreeStack());
     byte index;
     char c;
     while (file.available()) {
@@ -60,7 +62,7 @@ bool checkValidityAdmin(char * credentials) {
         }
     }
 
-	Serial.println(F("a fail"));
+	//Serial.println(F("a fail"));
     // Entry not found
     file.close();
     return false;
@@ -119,29 +121,31 @@ void checkCredentialsValidity(unsigned long t) {
 
     byte index;
     char c;
-    unsigned long pos;
-    unsigned long expiration;
     while (file.available()) {
         index = 0;
-
-        while ((c = file.read()) != '@'); // Advance until timestamp beginning
-        pos = file.position();	// Saving position in case it is needed to revoke
+		bool invalid = false;
+        while ((c = file.read()) != '@') { // Advance until timestamp beginning
+        	if (c == '#')
+        		invalid = true;
+        		
+        }
+        unsigned long pos = file.position();	// Saving position in case it is needed to revoke
 
         while ((c = file.read()) != '\n') { // Read all timestamp
             global[index] = c;
             index++;
             global[index] = '\0';
         }
-        expiration = strtoul(global, NULL, 10);
-        Serial.println(expiration);
-        if (expiration < t) { // Credential expired
-        	Serial.println(F("EXPIRED"));
+        unsigned long expiration = strtoul(global, NULL, 10);
+        //Serial.println(expiration);
+        if (expiration < t && !invalid) { // Credential expired
+        	//Serial.println(F("EXPIRED"));
             file.close();
             file = SD.open("/access.nop", FILE_WRITE);
             if (!file)
                 return;
-            file.seek(pos - 6); // 3 chars before \n
-            file.println("###"); // Invalidating line, the \n is overwritten
+            file.seek(pos - 3); // 3 chars before \n
+            file.print("##"); // Invalidating line, the \n is overwritten
             break; // Only one credential expiring at a time, for simplicity
         }
     }

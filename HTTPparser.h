@@ -8,8 +8,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define PATH_ALLOCATION 15
-#define MSG_ALLOCATION 40
+#define PATH_ALLOCATION 20
+#define MSG_ALLOCATION 45
 
 class HTTPparser {
 
