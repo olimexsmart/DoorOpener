@@ -8,14 +8,14 @@
     - Try to use data from the RTC instead of internal millis()
 
 */
-//#include <Wire.h>
+#include <Wire.h>
 #include <SPI.h>
 #include <Ethernet.h>
 #include <SdFat.h>
 #include "HTTPparser.h"
 #include <time.h>
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 #include "FreeStack.h"
@@ -28,6 +28,7 @@
 #define DS1307_ADDRESS 0x68
 #define chipSelectSD 9
 #define chipSelectEth 10
+#define ledClient 5
 #define resetEth 6
 #define opening 7
 #define watchDog 8
@@ -62,7 +63,9 @@ void setup()
     pinMode(resetEth, OUTPUT);
     pinMode(watchDog, OUTPUT);
     pinMode(opening, OUTPUT);
-    digitalWrite(opening, HIGH);
+    digitalWrite(opening, HIGH); // Closing contact immediately
+    pinMode(ledClient, OUTPUT);
+    digitalWrite(ledClient, LOW);    
     pinMode(chipSelectSD, OUTPUT); // Avoid conflict on SPI MISO
     digitalWrite(chipSelectSD, HIGH);
     digitalWrite(resetEth, LOW);
@@ -116,7 +119,7 @@ void loop()
 
     // Credentials checking
     if (Tcheck + 5000 < millis()) {
-        //checkCredentialsValidity(now());
+        checkCredentialsValidity(now());
         Tcheck = millis();
     }
 
@@ -143,6 +146,7 @@ void loop()
     client = server.available();  // try to get client
 
     if (client) {  // Got client?
+    	digitalWrite(ledClient, HIGH);    
         while (client.connected()) {	// Collecting data from client
             if (client.available()) {   // client data available to read
                 Parser.ParseChar(client.read()); // Read client one char
@@ -173,6 +177,7 @@ void loop()
         delay(1);      // give the web browser time to receive the data
         client.stop(); // close the connection
         Parser.Reset(); // Prepare parser for new request
+        digitalWrite(ledClient, LOW);    
     }
 }
 
@@ -183,7 +188,7 @@ void signalDog() {
     digitalWrite(watchDog, LOW);
 }
 
-/*
+
 unsigned long now() {
     struct tm t;
 
@@ -203,7 +208,7 @@ unsigned long now() {
     t.tm_year = bcdToDec(Wire.read()) + 130;
 
     return (unsigned long) mktime(&t);
-}*/
+}
 
 byte bcdToDec(byte val)  {
     // Convert binary coded decimal to normal decimal numbers
