@@ -10,7 +10,7 @@ bool checkValidity(char * credentials) {
     file = SD.open(F("/access.nop"));
     if (!file)
         return false;
-	//Serial.println(FreeStack());
+    //Serial.println(FreeStack());
     byte index;
     char c;
     while (file.available()) {
@@ -20,7 +20,7 @@ bool checkValidity(char * credentials) {
             index++;
             global[index] = '\0';
         }
-		//Serial.println(global);
+        //Serial.println(global);
         while ((c = file.read()) != '\n'); // Advance file pointer over timestamp
 
         if (strcmp(credentials, global) == 0) { // Check validity
@@ -29,7 +29,7 @@ bool checkValidity(char * credentials) {
         }
     }
 
-	//Serial.println(F("u fail"));
+    //Serial.println(F("u fail"));
     // Entry not found
     file.close();
     return false;
@@ -45,25 +45,26 @@ bool checkValidityAdmin(char * credentials) {
     file = SD.open(F("/admin.nop"));
     if (!file)
         return false;
-	//Serial.println(FreeStack());
+    //Serial.println(FreeStack());
     byte index;
     char c;
-    while (file.available()) {
+    if (file.available()) {
         index = 0;
         while ((c = file.read()) != '\n') { // Get one line from file
-            global[index] = c;
+            if (c != credentials[index]) {
+                file.close();
+                return false;
+            }
             index++;
-            global[index] = '\0';
         }
-
-        if (strcmp(credentials, global) == 0) { // Check validity
+        if (credentials[index] == '\0') { // In case right passowrd with cars at the end
             file.close();
-            return true; // Only successful exit point
+            return true;
         }
     }
 
-	//Serial.println(F("a fail"));
-    // Entry not found
+    //Serial.println(F("a fail"));
+    // Parachute
     file.close();
     return false;
 }
@@ -123,11 +124,11 @@ void checkCredentialsValidity(unsigned long t) {
     char c;
     while (file.available()) {
         index = 0;
-		bool invalid = false;
+        bool invalid = false;
         while ((c = file.read()) != '@') { // Advance until timestamp beginning
-        	if (c == '#')
-        		invalid = true;
-        		
+            if (c == '#')
+                invalid = true;
+
         }
         unsigned long pos = file.position();	// Saving position in case it is needed to revoke
 
@@ -139,7 +140,7 @@ void checkCredentialsValidity(unsigned long t) {
         unsigned long expiration = strtoul(global, NULL, 10);
         //Serial.println(expiration);
         if (expiration < t && !invalid) { // Credential expired
-        	//Serial.println(F("EXPIRED"));
+            //Serial.println(F("EXPIRED"));
             file.close();
             file = SD.open("/access.nop", FILE_WRITE);
             if (!file)

@@ -8,17 +8,23 @@
     - Try to use data from the RTC instead of internal millis()
 
 */
-#include <Wire.h>
+//#include <Wire.h>
 #include <SPI.h>
 #include <Ethernet.h>
-//#include <SD.h>
 #include <SdFat.h>
-//#include "FreeStack.h"
 #include "HTTPparser.h"
 #include <time.h>
 
+#define DEBUG
 
+#ifdef DEBUG
+#include "FreeStack.h"
+#define BUFF_SIZE 20
+#else
 #define BUFF_SIZE 100
+#endif
+
+
 #define DS1307_ADDRESS 0x68
 #define chipSelectSD 9
 #define chipSelectEth 10
@@ -26,12 +32,12 @@
 #define opening 7
 #define watchDog 8
 #define Y2K 946684800
-//#define DEBUG
+
 
 // MAC address
 byte mac[] = { 0x02, 0x42, 0xB5, 0x44, 0x17, 0x98 };
 
-IPAddress ip(192, 168, 1, 34); // IP address
+IPAddress ip(192, 168, 2, 34); // IP address
 EthernetServer server(80);  // Create a server at port 80
 EthernetClient client;
 HTTPparser Parser;
@@ -66,7 +72,7 @@ void setup()
 
 #ifdef DEBUG
     Serial.begin(9600);       // for debugging
-    Wire.begin();	// DS1307 RTC
+    //Wire.begin();	// DS1307 RTC
     Ethernet.begin(mac, ip);  // initialize Ethernet device
     server.begin();           // start to listen for clients
 
@@ -91,7 +97,7 @@ void setup()
     Serial.println(F("SUCCESS - Found index.htm file.\nDoor Opener READY"));
     Serial.print(F("Available RAM at end of setup: "));
     Serial.println(FreeStack());
-    Serial.println(now());
+    //Serial.println(now());
 #else
     Wire.begin();	// DS1307 RTC
     Ethernet.begin(mac, ip);  // initialize Ethernet device
@@ -110,7 +116,7 @@ void loop()
 
     // Credentials checking
     if (Tcheck + 5000 < millis()) {
-        checkCredentialsValidity(now());
+        //checkCredentialsValidity(now());
         Tcheck = millis();
     }
 
@@ -177,7 +183,7 @@ void signalDog() {
     digitalWrite(watchDog, LOW);
 }
 
-
+/*
 unsigned long now() {
     struct tm t;
 
@@ -197,7 +203,7 @@ unsigned long now() {
     t.tm_year = bcdToDec(Wire.read()) + 130;
 
     return (unsigned long) mktime(&t);
-}
+}*/
 
 byte bcdToDec(byte val)  {
     // Convert binary coded decimal to normal decimal numbers
