@@ -22,6 +22,7 @@
                 <div class="card-body bg-transparent">
                     <h4 class="card-title">PortoNet</h4>
                     <p class="card-text">Inserisci la chiave di accesso</p>
+                    <p class="card-text" id="count"></p>
                     <a href="http://vabbuo.it" class="mt-2 btn btn-success" title="Vabbuò dai guardati ancora due frasi">vabbuo.it</a>
                     <a href="http://olimexsmart.it" class="mt-2 btn btn-primary" title="Scopri tutta la storia, in inglese">olimexsmart.it</a>
                     <a href="/admin.htm" class="mt-2 btn btn-danger" title="Smanetta">Amministrazione</a>
@@ -185,7 +186,17 @@
                 //alert("Sent");                
                 $('#loader').show();
             });
-        })
+
+            $.ajax({
+                url: "count.ard",
+                method: "GET",
+                dataType: "text",
+                timeout: 10000,
+                success: function (result) {
+                    $('#count').text("Succesful openings: " + result);
+                }
+            });
+        })        
     </script>
 </body>
 

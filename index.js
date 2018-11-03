@@ -31,4 +31,14 @@ $(function () {
 		//alert("Sent");                
 		$('#loader').show();
 	});
+
+	$.ajax({
+		url: "count.ard",
+		method: "GET",
+		dataType: "text",
+		timeout: 10000,
+		success: function (result) {
+			$('count').text("Succesful openings: " + result);
+		}
+	});
 })

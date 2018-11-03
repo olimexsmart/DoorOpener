@@ -37,6 +37,10 @@ void answerClient() {
                         sendHeaders(200, "text/plain");
                     }
                 }
+            } else if (strcmp(Parser.Path, "/count.ard") == 0) { // Door openings count
+                sendHeaders(200, "text/html");
+                client.println(ReadCount());                
+                break;
             } else {	// 404 landing page
                 strcpy(Parser.Path, "/404.htm");
                 file = SD.open(F("/404.htm"));
@@ -85,7 +89,7 @@ void answerClient() {
                     // Split the string between administrator and user part
                     char * user = strstr(Parser.Message, "&k=");
                     user++; // We don't want the & amperstand
-                    byte offset = (user - Parser.Message) - 1; // Offset of where the user part starts       
+                    byte offset = (user - Parser.Message) - 1; // Offset of where the user part starts
                     strncpy(global, Parser.Message, offset);
                     global[offset] = '\0';
                     if (checkValidityAdmin(global) && !tooManyAttempts) {

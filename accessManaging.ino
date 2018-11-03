@@ -112,7 +112,7 @@ void logRequest(HTTPparser::MethodType method, char * path, char * message) {
 void openDoor() {
     digitalWrite(opening, LOW);
     delay(1500);
-    digitalWrite(opening, HIGH);
+    digitalWrite(opening, HIGH);   
 }
 
 void checkCredentialsValidity(unsigned long t) {
