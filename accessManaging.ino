@@ -99,6 +99,8 @@ void logRequest(HTTPparser::MethodType method, char * path, char * message) {
     if (!file) // If error of some sort
         return;
 
+	file.print(now());
+	file.write('\t');
     file.write(path, strlen(path));
     if (method == HTTPparser::POST) {
         file.write('\t');

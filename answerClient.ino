@@ -76,6 +76,8 @@ void answerClient() {
                 } else if (strcmp(Parser.Path, "/lock.ard") == 0) {
                     if (checkValidityAdmin(Parser.Message) && !tooManyAttempts) {
                         locked = !locked; // Toggle the locked status
+                        attempts = 0; // De-saturate attempts for idiots
+                        tooManyAttempts = false;
                         statusCode = locked ? 423 : 200;
                     } else
                         statusCode = tooManyAttempts ? 429 : 403;

@@ -32,13 +32,16 @@
 #define resetEth 6
 #define opening 7
 #define watchDog 8
-#define Y2K 946684800
+
+#define T_EXPIRED 30
+#define T_TOOMANY 30
+#define T_ATTEMPT 10
 
 
 // MAC address
 byte mac[] = { 0x02, 0x42, 0xB5, 0x44, 0x17, 0x98 };
 
-IPAddress ip(192, 168, 2, 34); // IP address
+IPAddress ip(192, 168, 1, 34); // IP address
 EthernetServer server(80);  // Create a server at port 80
 EthernetClient client;
 HTTPparser Parser;
@@ -108,8 +111,8 @@ void setup()
     SD.begin(chipSelectSD);
 #endif
 
-    Tattempts = millis();
-    Tcheck = millis();
+    Tattempts = now();
+    Tcheck = now();
 }
 
 void loop()
@@ -118,9 +121,9 @@ void loop()
     signalDog();
 
     // Credentials checking
-    if (Tcheck + 5000 < millis()) {
+    if (Tcheck + T_EXPIRED < now()) {
         checkCredentialsValidity(now());
-        Tcheck = millis();
+        Tcheck = now();
     }
 
 
@@ -137,9 +140,9 @@ void loop()
         If attempts is bigger than zero after 10 seconds decrease it a bit,
         only if we are not already over the max number of attempts
     */
-    if ((tooManyAttempts && millis() - Tattempts > 30000) || (attempts > 0 && !tooManyAttempts && millis() - Tattempts > 10000)) {
+    if ((tooManyAttempts && now() - Tattempts > T_TOOMANY) || (attempts > 0 && !tooManyAttempts && now() - Tattempts > T_ATTEMPT)) {
         attempts--;
-        Tattempts = millis();
+        Tattempts = now();
     }
 
 
