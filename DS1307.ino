@@ -50,14 +50,14 @@ int ReadRAM(int address, byte * buff, int n) {
     return b;
 }
 
-unsigned long ReadCount() {	
+unsigned long ReadCount(int q) {	
 	unsigned long n;
-	ReadRAM(0, (byte *) &n, 4);
+	ReadRAM(q * 4, (byte *) &n, 4);
 	return n;
 }
 
-void IncrementCount() {
-	unsigned long n = ReadCount();
+void IncrementCount(int q) {
+	unsigned long n = ReadCount(q);
 	n++;
-	WriteRAM(0, (byte *) &n, 4);
+	WriteRAM(q * 4, (byte *) &n, 4);
 }

@@ -39,7 +39,9 @@ void answerClient() {
                 }
             } else if (strcmp(Parser.Path, "/count.ard") == 0) { // Door openings count
                 sendHeaders(200, "text/html");
-                client.println(ReadCount());                
+                client.print(ReadCount(0));
+                client.print('#');
+                client.println(ReadCount(1));
                 break;
             } else {	// 404 landing page
                 strcpy(Parser.Path, "/404.htm");
@@ -65,8 +67,10 @@ void answerClient() {
                         // Open door here
                         open = true;
                         statusCode = 200;
-                    } else
+                    } else {
                         statusCode = tooManyAttempts ? 429 : (locked ? 423 : 403);
+                        IncrementCount(1);
+                    }
 
                     // Lock access
                 } else if (strcmp(Parser.Path, "/lock.ard") == 0) {

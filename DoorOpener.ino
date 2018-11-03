@@ -127,7 +127,7 @@ void loop()
     // Door opening
     if (open) {
         openDoor();
-        IncrementCount();
+        IncrementCount(0);
         open = false;
     }
     // Too many attempts check
