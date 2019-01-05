@@ -111,6 +111,18 @@ void logRequest(HTTPparser::MethodType method, char * path, char * message) {
     file.close();
 }
 
+void logReboot() {
+	
+	file = SD.open(F("/reboots.nop"), FILE_WRITE);
+	if (!file)
+		return;
+
+	file.print(now());
+	file.write('\n');
+
+	file.close();
+}
+
 void openDoor() {
     digitalWrite(opening, LOW);
     delay(1500);

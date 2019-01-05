@@ -41,7 +41,8 @@
 // MAC address
 byte mac[] = { 0x02, 0x42, 0xB5, 0x44, 0x17, 0x98 };
 
-IPAddress ip(192, 168, 1, 34); // IP address
+//IPAddress ip(192, 168, 1, 34); // IP address
+IPAddress ip(192, 168, 2, 34); // IP address
 EthernetServer server(80);  // Create a server at port 80
 EthernetClient client;
 HTTPparser Parser;
@@ -110,6 +111,8 @@ void setup()
     server.begin();           // start to listen for clients
     SD.begin(chipSelectSD);
 #endif
+
+	logReboot();
 
     Tattempts = now();
     Tcheck = now();
