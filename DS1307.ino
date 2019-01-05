@@ -1,22 +1,27 @@
 unsigned long now() {
-    struct tm t;
+    unsigned long epoch;
+    do {
+        struct tm t;
 
-    // Reset the register pointer
-    Wire.beginTransmission(DS1307_ADDRESS);
-    Wire.write(0x00);
-    Wire.endTransmission();
-    Wire.requestFrom(DS1307_ADDRESS, 7);
+        // Reset the register pointer
+        Wire.beginTransmission(DS1307_ADDRESS);
+        Wire.write(0x00);
+        Wire.endTransmission();
+        Wire.requestFrom(DS1307_ADDRESS, 7);
 
-    // Filling up tm structure, wday is ignored but is still needed to read it to advance register pointer
-    t.tm_sec = bcdToDec(Wire.read());
-    t.tm_min = bcdToDec(Wire.read());
-    t.tm_hour = bcdToDec(Wire.read() & 0b111111); //24 hour time
-    t.tm_wday = bcdToDec(Wire.read()) - 1;
-    t.tm_mday = bcdToDec(Wire.read()) - 1;
-    t.tm_mon = bcdToDec(Wire.read()) - 1;
-    t.tm_year = bcdToDec(Wire.read()) + 130;
+        // Filling up tm structure, wday is ignored but is still needed to read it to advance register pointer
+        t.tm_sec = bcdToDec(Wire.read());
+        t.tm_min = bcdToDec(Wire.read());
+        t.tm_hour = bcdToDec(Wire.read() & 0b111111); //24 hour time
+        t.tm_wday = bcdToDec(Wire.read()) - 1;
+        t.tm_mday = bcdToDec(Wire.read()) - 1;
+        t.tm_mon = bcdToDec(Wire.read()) - 1;
+        t.tm_year = bcdToDec(Wire.read()) + 130;
 
-    return (unsigned long) mktime(&t);
+        epoch = (unsigned long) mktime(&t);
+    } while (epoch < 1546708474); // Avoid bad results (current epoch)
+
+    return epoch;
 }
 
 byte bcdToDec(byte val)  {
@@ -44,20 +49,20 @@ int ReadRAM(int address, byte * buff, int n) {
     Wire.requestFrom(DS1307_ADDRESS, n);
     int b = 0;
     while (Wire.available()) {
-        buff[b] = Wire.read();        
+        buff[b] = Wire.read();
         b++;
     }
     return b;
 }
 
-unsigned long ReadCount(int q) {	
-	unsigned long n;
-	ReadRAM(q * 4, (byte *) &n, 4);
-	return n;
+unsigned long ReadCount(int q) {
+    unsigned long n;
+    ReadRAM(q * 4, (byte *) &n, 4);
+    return n;
 }
 
 void IncrementCount(int q) {
-	unsigned long n = ReadCount(q);
-	n++;
-	WriteRAM(q * 4, (byte *) &n, 4);
+    unsigned long n = ReadCount(q);
+    n++;
+    WriteRAM(q * 4, (byte *) &n, 4);
 }
