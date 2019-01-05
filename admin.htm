@@ -42,6 +42,8 @@
                             <input type="radio" name="a" id="r3" autocomplete="off">Nuovo</label>
                         <label class="btn btn-secondary">
                             <input type="radio" name="a" id="r4" autocomplete="off">Test</label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="a" id="r5" autocomplete="off">Keys</label>
                     </div>
                 </div>
             </fieldset>
@@ -71,7 +73,7 @@
                         <b>Master Password</b>
                     </label>
                     <div class="mt-2 col-sm-10 adminpassword">
-                        <input type="password" class="form-control" name="ak" id="key" placeholder="Chiave Admin" title="Mi raccomando">
+                        <input type="password" class="form-control passwd" name="ak" id="key" placeholder="Chiave Admin" title="Mi raccomando">
                     </div>
 
                     <!-- User inputs -->
@@ -79,7 +81,7 @@
                         <b>Password</b>
                     </label>
                     <div class="mt-2 col-sm-10 userpassword">
-                        <input type="password" class="form-control" name="k" id="userkey" placeholder="Chiave Utente" title="Mi raccomando">
+                        <input type="password" class="form-control passwd" name="k" id="userkey" placeholder="Chiave Utente" title="Mi raccomando">
                     </div>
 
 
@@ -89,6 +91,8 @@
                     </div>
                 </div>
             </form>
+
+            <ul class="list-group" id="list" type="hidden"></ul>
         </div>
     </div>
 
@@ -208,27 +212,48 @@
                 $('.adminpassword').show();
                 $('.userpassword').hide();
                 $('#timeval').hide();
+                $('#list').hide();
                 res = "lock.ard";
             });
             $('#r2').on('change', function () {
                 $('.adminpassword').show();
                 $('.userpassword').hide();
                 $('#timeval').hide();
+                $('#list').hide();
                 res = "revokeAll.ard";
             });
             $('#r3').on('change', function () {
                 $('.adminpassword').show();
                 $('.userpassword').show();
                 $('#timeval').show();
+                $('#list').hide();
                 res = "add.ard";
             });
             $('#r4').on('change', function () {
                 $('.adminpassword').hide();
                 $('.userpassword').show();
                 $('#timeval').hide();
+                $('#list').hide();
                 res = "check.ard";
             });
+            $('#r5').on('change', function () {
+                $('.adminpassword').show();
+                $('.userpassword').hide();
+                $('#timeval').hide();
+                $('#list').show();
+                res = "active.ard";
+            });
 
+            $('.passwd').keydown(function (event) {
+                var keyCode = (event.keyCode ? event.keyCode : event.which);
+                if (keyCode == 13) {
+                    $('#submit').trigger('click');
+                }
+            });
+
+            $('#access').submit(function (e) {
+                e.preventDefault();
+            });
 
             //handle = null;
             $('#submit').click(function () {
@@ -243,8 +268,27 @@
                     data: d,
                     timeout: 10000,
                     success: function (result) {
-                        $('#loader').hide();
-                        $('#completed').modal();
+                        //console.log(result);
+                        if (result.length > 0) { // Fill list
+                            var entries = result.split('\n');
+                            entries.forEach(e => {
+                                if (e.length > 1) {// Double \n entries                                    
+                                    var at = e.indexOf('@');
+                                    var key = e.substr(2, at - 2);
+                                    var d = new Date(e.substr(at + 1) * 1000);
+                                    var date = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes()
+                                    $('#list').append(`<li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    ${key}
+                                                    <span class="badge badge-primary badge-pill">${date}</span>
+                                                    </li>`);
+                                }
+                            });
+                            $('#list').show();
+                            
+                        } else {
+                            $('#completed').modal();
+                        }
+                        $('#loader').hide();                        
                     },
                     error: function (result) {
                         $('#loader').hide();

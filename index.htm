@@ -154,7 +154,33 @@
 
     <!-- <script src="index.js"></script> -->
     <script>
+        function getCounters() {
+            $.ajax({
+                url: "count.ard",
+                method: "GET",
+                dataType: "text",
+                timeout: 10000,
+                success: function (result) {
+                    q = result.split('#');
+                    $('#count1').text("Numero totale aperture: " + q[0]);
+                    $('#count2').text("Tentativi falliti: " + q[1]);
+                }
+            });
+        }
+
         $(function () {
+
+            $('#key').keydown(function (event) {
+                var keyCode = (event.keyCode ? event.keyCode : event.which);
+                if (keyCode == 13) {
+                    $('#submit').trigger('click');
+                }
+            });
+
+            $('#access').submit(function (e) {
+                e.preventDefault();
+            });
+
             $('#submit').click(function () {
                 $.ajax({	// Send request
                     url: "login.ard",
@@ -165,6 +191,7 @@
                     success: function (result) {
                         $('#loader').hide();
                         $('#open').modal();
+                        getCounters();
                     },
                     error: function (result) {
                         $('#loader').hide();
@@ -182,24 +209,15 @@
                                 $('#default').modal();
                                 break;
                         }
+                        getCounters();
                     }
                 });
                 //alert("Sent");                
                 $('#loader').show();
             });
 
-            $.ajax({
-                url: "count.ard",
-                method: "GET",
-                dataType: "text",
-                timeout: 10000,
-                success: function (result) {
-                    q = result.split('#');
-                    $('#count1').text("Numero totale aperture: " + q[0]);
-                    $('#count2').text("Tentativi falliti: " + q[1]);
-                }
-            });
-        })        
+            getCounters();
+        });
     </script>
 </body>
 

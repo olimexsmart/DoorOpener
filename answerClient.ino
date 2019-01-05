@@ -112,6 +112,17 @@ void answerClient() {
                         statusCode = 200;
                     } else
                         statusCode = tooManyAttempts ? 429 : 403;
+                } else if (strcmp(Parser.Path, "/active.ard") == 0) {
+                    if (checkValidityAdmin(Parser.Message) && !tooManyAttempts) {
+                        sendHeaders(200, "text/plain");
+                        file = SD.open("/access.nop");                        
+                        while (file.available()) { // Send the actual file
+                            client.write(global, file.read(global, BUFF_SIZE)); // send web page to client
+                        }
+                        file.close(); 
+                        break; // 
+                    } else
+                        statusCode = tooManyAttempts ? 429 : 403;
                 }
 
                 if (statusCode == 403) // Wrong password
