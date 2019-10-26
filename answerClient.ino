@@ -30,6 +30,10 @@ void answerClient() {
                         sendHeaders(200, "text/javascript");
                     } else if (strcmp(point + 1, "ico") == 0) {
                         sendHeaders(200, "image/x-icon");
+                    } else if (strcmp(point + 1, "png") == 0) {
+                        sendHeaders(200, "image/png");
+                    } else if (strcmp(point + 1, "webmanifest") == 0) {
+                        sendHeaders(200, "application/manifest+json");
                     } else if (strcmp(point + 1, "nop") == 0) {
                         sendHeaders(403, NULL);
                         break; // Break from GET
@@ -121,6 +125,17 @@ void answerClient() {
                     if (checkValidityAdmin(Parser.Message) && !tooManyAttempts) {
                         sendHeaders(200, "text/plain");
                         file = SD.open("/access.nop");
+                        while (file.available()) { // Send the actual file
+                            client.write(global, file.read(global, BUFF_SIZE)); // send web page to client
+                        }
+                        file.close();
+                        break; //
+                    } else
+                        statusCode = tooManyAttempts ? 429 : 403;
+                } else if (strcmp(Parser.Path, "/posts") == 0) {
+                    if (checkValidityAdmin(Parser.Message) && !tooManyAttempts) {
+                        sendHeaders(200, "text/plain");
+                        file = SD.open("/LOGPOST.NOP");
                         while (file.available()) { // Send the actual file
                             client.write(global, file.read(global, BUFF_SIZE)); // send web page to client
                         }

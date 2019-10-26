@@ -45,6 +45,8 @@
                             <input type="radio" name="a" id="r4" autocomplete="off">Test</label>
                         <label class="btn btn-secondary">
                             <input type="radio" name="a" id="r5" autocomplete="off">Keys</label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="a" id="r6" autocomplete="off">Log</label>
                     </div>
                 </div>
             </fieldset>
@@ -70,7 +72,7 @@
                 <!-- Text inputs -->
                 <div class="form-group row">
                     <!-- Administrator inputs -->
-                    <label for="key" class="mt-2 col-sm-2 col-form-label adminpassword">
+                    <label for="key" class="col-sm-2 col-form-label adminpassword">
                         <b>Master Password</b>
                     </label>
                     <div class="mt-2 col-sm-10 adminpassword">
@@ -244,6 +246,13 @@
                 $('#list').show();
                 res = "active";
             });
+            $('#r6').on('change', function () {
+                $('.adminpassword').show();
+                $('.userpassword').hide();
+                $('#timeval').hide();
+                $('#list').show();
+                res = "posts";
+            });
 
             $('.passwd').keydown(function (event) {
                 var keyCode = (event.keyCode ? event.keyCode : event.which);
@@ -272,19 +281,35 @@
                         //console.log(result);
                         if (result.length > 0) { // Fill list
                             $('#list').empty() 
-                            var entries = result.split('\n');
-                            entries.forEach(e => {
-                                if (e.length > 1) {// Double \n entries                                    
-                                    var at = e.indexOf('@');
-                                    var key = e.substr(2, at - 2);
-                                    var d = new Date(e.substr(at + 1) * 1000);
+
+                            if ($('#r5')[0].checked) {
+                                var entries = result.split('\n');
+                                entries.forEach(e => {
+                                    if (e.length > 1) {// Double \n entries                                    
+                                        var at = e.indexOf('@');
+                                        var key = e.substr(2, at - 2);
+                                        var d = new Date(e.substr(at + 1) * 1000);
+                                        var date = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes()
+                                        $('#list').append(`<li class="list-group-item d-flex justify-content-between align-items-center">
+                                                        ${key}
+                                                        <span class="badge badge-primary badge-pill">${date}</span>
+                                                        </li>`);
+                                    }
+                                });
+                            } else if ($('#r6')[0].checked) {
+                                //console.log(result)
+                                posts = CSVToArray(result, '\t');
+
+                                for (let i = posts.length - 30; i < posts.length - 1 ; i++) {
+                                    let d = new Date(posts[i][0] * 1000);
                                     var date = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes()
+
                                     $('#list').append(`<li class="list-group-item d-flex justify-content-between align-items-center">
-                                                    ${key}
-                                                    <span class="badge badge-primary badge-pill">${date}</span>
-                                                    </li>`);
+                                                        ${posts[i][1] + ' ' + posts[i][2]}
+                                                        <span class="badge badge-primary badge-pill">${date}</span>
+                                                        </li>`);
                                 }
-                            });
+                            }
                             $('#list').show();
                             
                         } else {
@@ -327,6 +352,89 @@
                 }
             });
         })
+
+        function CSVToArray( strData, strDelimiter ){
+        // Check to see if the delimiter is defined. If not,
+        // then default to comma.
+        strDelimiter = (strDelimiter || ",");
+
+        // Create a regular expression to parse the CSV values.
+        var objPattern = new RegExp(
+            (
+                // Delimiters.
+                "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+
+                // Quoted fields.
+                "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+
+                // Standard fields.
+                "([^\"\\" + strDelimiter + "\\r\\n]*))"
+            ),
+            "gi"
+            );
+
+
+        // Create an array to hold our data. Give the array
+        // a default empty first row.
+        var arrData = [[]];
+
+        // Create an array to hold our individual pattern
+        // matching groups.
+        var arrMatches = null;
+
+
+        // Keep looping over the regular expression matches
+        // until we can no longer find a match.
+        while (arrMatches = objPattern.exec( strData )){
+
+            // Get the delimiter that was found.
+            var strMatchedDelimiter = arrMatches[ 1 ];
+
+            // Check to see if the given delimiter has a length
+            // (is not the start of string) and if it matches
+            // field delimiter. If id does not, then we know
+            // that this delimiter is a row delimiter.
+            if (
+                strMatchedDelimiter.length &&
+                strMatchedDelimiter !== strDelimiter
+                ){
+
+                // Since we have reached a new row of data,
+                // add an empty row to our data array.
+                arrData.push( [] );
+
+            }
+
+            var strMatchedValue;
+
+            // Now that we have our delimiter out of the way,
+            // let's check to see which kind of value we
+            // captured (quoted or unquoted).
+            if (arrMatches[ 2 ]){
+
+                // We found a quoted value. When we capture
+                // this value, unescape any double quotes.
+                strMatchedValue = arrMatches[ 2 ].replace(
+                    new RegExp( "\"\"", "g" ),
+                    "\""
+                    );
+
+            } else {
+
+                // We found a non-quoted value.
+                strMatchedValue = arrMatches[ 3 ];
+
+            }
+
+
+            // Now that we have our value string, let's add
+            // it to the data array.
+            arrData[ arrData.length - 1 ].push( strMatchedValue );
+        }
+
+        // Return the parsed data.
+        return( arrData );
+    }
     </script>
 </body>
 

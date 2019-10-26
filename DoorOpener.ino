@@ -3,6 +3,7 @@
 
     TODO:
     - See access list on web page
+    - There is about half an hour of error in the epoch conversion
 
 */
 #include <Wire.h>

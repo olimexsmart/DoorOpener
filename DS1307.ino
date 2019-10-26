@@ -75,7 +75,7 @@ void setDateTime() {
 
     // To set the time and date, update the following codes.
     byte second =      00; //0-59
-    byte minute =      47; //0-59
+    byte minute =      33; //0-59
     byte hour =        18; //0-23
     byte weekDay =     6; //1-7
     byte monthDay =    26; //1-31
