@@ -156,7 +156,7 @@
     <script>
         function getCounters() {
             $.ajax({
-                url: "count.ard",
+                url: "count",
                 method: "GET",
                 dataType: "text",
                 timeout: 10000,
@@ -183,7 +183,7 @@
 
             $('#submit').click(function () {
                 $.ajax({	// Send request
-                    url: "login.ard",
+                    url: "login",
                     method: "POST",
                     dataType: "text",
                     data: $('#access').serialize(),

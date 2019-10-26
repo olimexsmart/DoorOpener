@@ -99,8 +99,8 @@ void logRequest(HTTPparser::MethodType method, char * path, char * message) {
     if (!file) // If error of some sort
         return;
 
-	file.print(now());
-	file.write('\t');
+    file.print(now());
+    file.write('\t');
     file.write(path, strlen(path));
     if (method == HTTPparser::POST) {
         file.write('\t');
@@ -112,21 +112,21 @@ void logRequest(HTTPparser::MethodType method, char * path, char * message) {
 }
 
 void logReboot() {
-	
-	file = SD.open(F("/reboots.nop"), FILE_WRITE);
-	if (!file)
-		return;
 
-	file.print(now());
-	file.write('\n');
+    file = SD.open(F("/reboots.nop"), FILE_WRITE);
+    if (!file)
+        return;
 
-	file.close();
+    file.print(now());
+    file.write('\n');
+
+    file.close();
 }
 
 void openDoor() {
     digitalWrite(opening, LOW);
     delay(1500);
-    digitalWrite(opening, HIGH);   
+    digitalWrite(opening, HIGH);
 }
 
 void checkCredentialsValidity(unsigned long t) {
@@ -167,4 +167,3 @@ void checkCredentialsValidity(unsigned long t) {
 
     file.close();
 }
-

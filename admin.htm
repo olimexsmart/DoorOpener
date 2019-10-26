@@ -23,6 +23,7 @@
                 <div class="card-body bg-transparent">
                     <h4 class="card-title">Amministrazione</h4>
                     <p class="card-text">Se sei qui per fare dei casini buona fortuna</p>
+                    <p id="rtc"></p>
                     <a href="/index.htm" class="mt-2 btn btn-info" title="Magari funziona">Pagina Login</a>
                 </div>
             </div>
@@ -205,7 +206,7 @@
             // Without these two lines any options has the property checked to true
             $('#r3')[0].checked = true;
             $('#v1')[0].checked = true;
-            res = "add.ard";
+            res = "add";
             // Modifing the visibility of the UI
             // elements depending on the desired action
             $('#r1').on('change', function () {
@@ -213,35 +214,35 @@
                 $('.userpassword').hide();
                 $('#timeval').hide();
                 $('#list').hide();
-                res = "lock.ard";
+                res = "lock";
             });
             $('#r2').on('change', function () {
                 $('.adminpassword').show();
                 $('.userpassword').hide();
                 $('#timeval').hide();
                 $('#list').hide();
-                res = "revokeAll.ard";
+                res = "revokeAll";
             });
             $('#r3').on('change', function () {
                 $('.adminpassword').show();
                 $('.userpassword').show();
                 $('#timeval').show();
                 $('#list').hide();
-                res = "add.ard";
+                res = "add";
             });
             $('#r4').on('change', function () {
                 $('.adminpassword').hide();
                 $('.userpassword').show();
                 $('#timeval').hide();
                 $('#list').hide();
-                res = "check.ard";
+                res = "check";
             });
             $('#r5').on('change', function () {
                 $('.adminpassword').show();
                 $('.userpassword').hide();
                 $('#timeval').hide();
                 $('#list').show();
-                res = "active.ard";
+                res = "active";
             });
 
             $('.passwd').keydown(function (event) {
@@ -270,6 +271,7 @@
                     success: function (result) {
                         //console.log(result);
                         if (result.length > 0) { // Fill list
+                            $('#list').empty() 
                             var entries = result.split('\n');
                             entries.forEach(e => {
                                 if (e.length > 1) {// Double \n entries                                    
@@ -311,6 +313,18 @@
                 });
                 //alert("Sent");                
                 $('#loader').show();
+            });
+
+            // Getting RTC from system
+            $.ajax({
+                url: "epoch",
+                method: "GET",
+                dataType: "text",
+                timeout: 10000,
+                success: function (result) {
+                    date = new Date(result * 1000);
+                    $('#rtc').text("Ora del sistema: " + date.toLocaleTimeString() + " " + date.toDateString());
+                }
             });
         })
     </script>

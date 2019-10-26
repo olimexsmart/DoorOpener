@@ -5,27 +5,27 @@
 
 #include "HTTPparser.h"
 
-/* //	Dynamic allocation is not a good idea in an embedded system
-HTTPparser::HTTPparser(unsigned int pathSize, unsigned int messageSize)
+/*  //	Dynamic allocation is not a good idea in an embedded system
+    HTTPparser::HTTPparser(unsigned int pathSize, unsigned int messageSize)
     : pathAllocation(pathSize),  messageAllocation (messageSize) {
     // Allocate the buffers
-    
+
     Path = (char *) malloc (pathAllocation);
     Message = (char *) malloc(messageAllocation);
-    
+
     // Start from a known configuration
     Reset();
-}
+    }
 */
 HTTPparser::HTTPparser() {
-	pathAllocation = PATH_ALLOCATION;
-	messageAllocation = MSG_ALLOCATION;
-	Reset();
+    pathAllocation = PATH_ALLOCATION;
+    messageAllocation = MSG_ALLOCATION;
+    Reset();
 }
 
 HTTPparser::~HTTPparser() {
-    /*free(Path);
-    free(Message);*/
+    /*  free(Path);
+        free(Message);*/
 }
 
 void HTTPparser::Reset() {
@@ -65,7 +65,7 @@ void HTTPparser::ParseChar(char c) {
                 if (Method == NR) {
                     status = ERROR;
                     return;
-                }                
+                }
                 status = PATH;
                 index = 0;
                 return;
@@ -121,4 +121,3 @@ void HTTPparser::ParseChar(char c) {
             break;
     }
 }
-

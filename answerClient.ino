@@ -37,13 +37,18 @@ void answerClient() {
                         sendHeaders(200, "text/plain");
                     }
                 }
-            } else if (strcmp(Parser.Path, "/count.ard") == 0) { // Door openings count
+            } else if (strcmp(Parser.Path, "/count") == 0) { // Door openings count
                 sendHeaders(200, "text/html");
                 client.print(ReadCount(0));
                 client.print('#');
                 client.println(ReadCount(1));
                 break;
-            } else {	// 404 landing page
+            } else if (strcmp(Parser.Path, "/epoch") == 0) { // To check RTC clock
+                sendHeaders(200, "text/plain");
+                client.print(now());
+                break;
+            }
+            else {	// 404 landing page
                 strcpy(Parser.Path, "/404.htm");
                 file = SD.open(F("/404.htm"));
                 sendHeaders(404, "text/html");
@@ -62,7 +67,7 @@ void answerClient() {
                 int statusCode = 418; // This will remain unchanged if resource requested is unknown
 
                 // Login attempt
-                if (strcmp(Parser.Path, "/login.ard") == 0) {
+                if (strcmp(Parser.Path, "/login") == 0) {
                     if (checkValidity(Parser.Message) && !tooManyAttempts && !locked) {
                         // Open door here
                         open = true;
@@ -73,7 +78,7 @@ void answerClient() {
                     }
 
                     // Lock access
-                } else if (strcmp(Parser.Path, "/lock.ard") == 0) {
+                } else if (strcmp(Parser.Path, "/lock") == 0) {
                     if (checkValidityAdmin(Parser.Message) && !tooManyAttempts) {
                         locked = !locked; // Toggle the locked status
                         attempts = 0; // De-saturate attempts for idiots
@@ -83,7 +88,7 @@ void answerClient() {
                         statusCode = tooManyAttempts ? 429 : 403;
 
                     // Remove all users
-                } else if (strcmp(Parser.Path, "/revokeAll.ard") == 0) {
+                } else if (strcmp(Parser.Path, "/revokeAll") == 0) {
                     if (checkValidityAdmin(Parser.Message) && !tooManyAttempts) {
                         statusCode = 200;
                         SD.remove("/access.nop");	// Without the file is not possible to login
@@ -91,7 +96,7 @@ void answerClient() {
                         statusCode = tooManyAttempts ? 429 : 403;
 
                     // Add a user
-                } else if (strcmp(Parser.Path, "/add.ard") == 0) {
+                } else if (strcmp(Parser.Path, "/add") == 0) {
                     // Split the string between administrator and user part
                     char * user = strstr(Parser.Message, "&k=");
                     user++; // We don't want the & amperstand
@@ -107,20 +112,20 @@ void answerClient() {
                         statusCode = tooManyAttempts ? 429 : 403;
 
                     // Check the validity of user credentials
-                } else if (strcmp(Parser.Path, "/check.ard") == 0) {
+                } else if (strcmp(Parser.Path, "/check") == 0) {
                     if (checkValidity(Parser.Message) && !tooManyAttempts) {
                         statusCode = 200;
                     } else
                         statusCode = tooManyAttempts ? 429 : 403;
-                } else if (strcmp(Parser.Path, "/active.ard") == 0) {
+                } else if (strcmp(Parser.Path, "/active") == 0) {
                     if (checkValidityAdmin(Parser.Message) && !tooManyAttempts) {
                         sendHeaders(200, "text/plain");
-                        file = SD.open("/access.nop");                        
+                        file = SD.open("/access.nop");
                         while (file.available()) { // Send the actual file
                             client.write(global, file.read(global, BUFF_SIZE)); // send web page to client
                         }
-                        file.close(); 
-                        break; // 
+                        file.close();
+                        break; //
                     } else
                         statusCode = tooManyAttempts ? 429 : 403;
                 }
@@ -178,7 +183,3 @@ void sendHeaders(int code, const char * mime) {
     client.println(F("Connection: close"));
     client.println();
 }
-
-
-
-

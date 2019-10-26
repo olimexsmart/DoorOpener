@@ -2,10 +2,7 @@
     Server Door Opener
 
     TODO:
-    - Remove dynamic allocation
-    - Optimize RAM usage as possible, find at least 141 bytes
-    - Create Log page using time information
-    - Try to use data from the RTC instead of internal millis()
+    - See access list on web page
 
 */
 #include <Wire.h>
@@ -37,6 +34,8 @@
 #define T_TOOMANY 30
 #define T_ATTEMPT 10
 
+#define AUTORESET 86400000 // Reset once a day
+
 
 // MAC address
 byte mac[] = { 0x02, 0x42, 0xB5, 0x44, 0x17, 0x98 };
@@ -52,7 +51,7 @@ File file;
 // Too any attempts variables
 bool tooManyAttempts = false;
 bool locked = false;
-unsigned long Tattempts, Tcheck;
+unsigned long Tattempts, Tcheck, Tautoreset;
 byte attempts = 0;
 
 // Open door flag, the opening is blocking (very simple)
@@ -64,12 +63,13 @@ char global[BUFF_SIZE];
 void setup()
 {
     Ethernet.init(chipSelectEth);
+    Wire.begin();    // DS1307 RTC
     pinMode(resetEth, OUTPUT);
     pinMode(watchDog, OUTPUT);
     pinMode(opening, OUTPUT);
     digitalWrite(opening, HIGH); // Closing contact immediately
     pinMode(ledClient, OUTPUT);
-    digitalWrite(ledClient, LOW);    
+    digitalWrite(ledClient, LOW);
     pinMode(chipSelectSD, OUTPUT); // Avoid conflict on SPI MISO
     digitalWrite(chipSelectSD, HIGH);
     digitalWrite(resetEth, LOW);
@@ -77,11 +77,13 @@ void setup()
     digitalWrite(resetEth, HIGH);
     delay(100);
 
-#ifdef DEBUG
-    Serial.begin(9600);       // for debugging
-    //Wire.begin();	// DS1307 RTC
     Ethernet.begin(mac, ip);  // initialize Ethernet device
     server.begin();           // start to listen for clients
+
+    //setDateTime(); // Setting date time if needed
+
+#ifdef DEBUG
+    Serial.begin(9600);       // for debugging
 
     if (Ethernet.hardwareStatus() == EthernetW5500) {
         Serial.print(F("SUCCESS - W5500 Ethernet controller detected. Server is at: "));
@@ -104,29 +106,29 @@ void setup()
     Serial.println(F("SUCCESS - Found index.htm file.\nDoor Opener READY"));
     Serial.print(F("Available RAM at end of setup: "));
     Serial.println(FreeStack());
-    //Serial.println(now());
+    Serial.println(now());
 #else
-    Wire.begin();	// DS1307 RTC
-    Ethernet.begin(mac, ip);  // initialize Ethernet device
-    server.begin();           // start to listen for clients
     SD.begin(chipSelectSD);
 #endif
 
-	logReboot();
+    logReboot();
 
-    Tattempts = now();
-    Tcheck = now();
+    Tattempts = Tcheck = Tautoreset = now();
 }
 
 void loop()
 {
+    // Call this only once for entire loop
+    unsigned long ora = now();
+
     // Reset watchdog
-    signalDog();
+    if (Tautoreset + AUTORESET > ora) // When this has expired, let the watchdog rest us
+        signalDog();
 
     // Credentials checking
-    if (Tcheck + T_EXPIRED < now()) {
-        checkCredentialsValidity(now());
-        Tcheck = now();
+    if (Tcheck + T_EXPIRED < ora) {
+        checkCredentialsValidity(ora);
+        Tcheck = ora;
     }
 
 
@@ -143,9 +145,9 @@ void loop()
         If attempts is bigger than zero after 10 seconds decrease it a bit,
         only if we are not already over the max number of attempts
     */
-    if ((tooManyAttempts && now() - Tattempts > T_TOOMANY) || (attempts > 0 && !tooManyAttempts && now() - Tattempts > T_ATTEMPT)) {
+    if ((tooManyAttempts && ora - Tattempts > T_TOOMANY) || (attempts > 0 && !tooManyAttempts && ora - Tattempts > T_ATTEMPT)) {
         attempts--;
-        Tattempts = now();
+        Tattempts = ora;
     }
 
 
@@ -153,7 +155,7 @@ void loop()
     client = server.available();  // try to get client
 
     if (client) {  // Got client?
-    	digitalWrite(ledClient, HIGH);    
+        digitalWrite(ledClient, HIGH);
         while (client.connected()) {	// Collecting data from client
             if (client.available()) {   // client data available to read
                 Parser.ParseChar(client.read()); // Read client one char
@@ -165,18 +167,18 @@ void loop()
         // Tell the parser we are done
         Parser.AllSheWrote();
         if (Parser.IsValid()) { // Print some debug
-#ifdef DEBUG        	        	
+#ifdef DEBUG
             Serial.println();
             Serial.println(Parser.MethodString());
             Serial.println(Parser.Path);
             Serial.println(Parser.Message);
-#endif        
+#endif
             // Answer the client and elaborate actions
             answerClient();
         } else {
-#ifdef DEBUG        	
-            Serial.println(F("We have an error"));            
-#endif            
+#ifdef DEBUG
+            Serial.println(F("We have an error"));
+#endif
             // Error 500
             sendHeaders(500, NULL);
         }
@@ -184,7 +186,7 @@ void loop()
         delay(1);      // give the web browser time to receive the data
         client.stop(); // close the connection
         Parser.Reset(); // Prepare parser for new request
-        digitalWrite(ledClient, LOW);    
+        digitalWrite(ledClient, LOW);
     }
 }
 
@@ -194,7 +196,3 @@ void signalDog() {
     delay(10);
     digitalWrite(watchDog, LOW);
 }
-
-
-
-

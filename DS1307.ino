@@ -29,6 +29,10 @@ byte bcdToDec(byte val)  {
     return ( (val / 16 * 10) + (val % 16) );
 }
 
+byte decToBcd(byte val) {
+    // Convert normal decimal numbers to binary coded decimal
+    return ( (val / 10 * 16) + (val % 10) );
+}
 
 void WriteRAM(int address, byte * data, int n) {
     if (address > 55)
@@ -65,4 +69,33 @@ void IncrementCount(int q) {
     unsigned long n = ReadCount(q);
     n++;
     WriteRAM(q * 4, (byte *) &n, 4);
+}
+
+void setDateTime() {
+
+    // To set the time and date, update the following codes.
+    byte second =      00; //0-59
+    byte minute =      47; //0-59
+    byte hour =        18; //0-23
+    byte weekDay =     6; //1-7
+    byte monthDay =    26; //1-31
+    byte month =       10; //1-12
+    byte year  =       19; //0-99
+    // update until here.
+
+    Wire.beginTransmission(DS1307_ADDRESS);
+    Wire.write(0x00);
+
+    Wire.write(decToBcd(second));
+    Wire.write(decToBcd(minute));
+    Wire.write(decToBcd(hour));
+    Wire.write(decToBcd(weekDay));
+    Wire.write(decToBcd(monthDay));
+    Wire.write(decToBcd(month));
+    Wire.write(decToBcd(year));
+
+    Wire.write(0x00);
+
+    Wire.endTransmission();
+
 }
